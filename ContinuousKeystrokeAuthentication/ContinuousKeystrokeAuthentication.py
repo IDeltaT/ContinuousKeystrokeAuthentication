@@ -1,4 +1,5 @@
 ﻿import tkinter as TK
+from PIL import Image
 import customtkinter as CTk
 from transitions import Machine
 
@@ -77,16 +78,13 @@ class App(CTk.CTk):
     HEIGHT = 600
 
     
+    CTk.set_appearance_mode("dark")         # Тема приложения по умолчанию: Темная
+    CTk.set_default_color_theme("green")    # Цветовая тема приложения по умолчанию: Зеленая
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        
-        
-        #self.state_machine = StateMachine()
-
-        #print(self.state_machine.state)
-        #self.state_machine.switch_to_password_authorization()
-
+        # Инициализация машины состояний
         self.state_machine = StateMachine()
         self.machine = Machine(model = self.state_machine, 
                                states = StateMachine.states, 
@@ -96,9 +94,63 @@ class App(CTk.CTk):
         #print(state_machine.state)
         #state_machine.switch_to_registration()
         #print(state_machine.state)
+
         
+        self.title('Программное средство аутентификации пользователя на основе клавиатурного почерка')
+        self.geometry(f'{self.WIDTH}x{self.HEIGHT}') # Ширина и Высота окна
+        self.resizable(False, False) # Запрет на изменение размеров окна
+        self.iconbitmap('images/Icon_Key_Lock.ico') # Иконка программы
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        
+        # ------------------------------ password authorization frame ------------------------------------- #
+        # Загрузка и установка заднего фона
+        self.bg_image = CTk.CTkImage(Image.open('images/bg_gradient.jpg'), size=(self.WIDTH, self.HEIGHT))
+        self.bg_image_label = CTk.CTkLabel(self, text='', image=self.bg_image)
+        self.bg_image_label.grid(row=0, column=0)
+        
+        # Название программного средства
+        program_name = 'ПРОГРАММНОЕ\nСРЕДСТВО\nБИОМЕТРИЧЕСКОЙ\nАУТЕНТИФИКАЦИИ\nНА ОСНОВЕ\nКЛАВИАТУРНОГО\nПОЧЕРКА'
+        
+        # Создание фрейма окна авторизации
+        self.password_authorization_frame = CTk.CTkFrame(self, corner_radius=0)
+        self.password_authorization_frame.grid(row=0, column=0, sticky='ns')
+        
+        # Отображение названия программы (Label)
+        self.program_name_label = CTk.CTkLabel(self.password_authorization_frame, text=program_name, 
+                                               font=CTk.CTkFont(size=20, weight='bold'))
+        self.program_name_label.grid(row=0, column=0, padx=30, pady=(60, 15))
+        
+        # Лейбл: "Авторизация"
+        self.authorization_label = CTk.CTkLabel(self.password_authorization_frame, text='АВТОРИЗАЦИЯ', 
+                                               font=CTk.CTkFont(size=20, weight='bold'))
+        self.authorization_label.grid(row=1, column=0, padx=30, pady=(40, 15))
+  
+        # Поле для ввода логина
+        self.username_entry = CTk.CTkEntry(self.password_authorization_frame, width=200, 
+                                           placeholder_text='Имя пользователя')
+        self.username_entry.grid(row=2, column=0, padx=30, pady=(15, 15))
+        
+        # Поле для ввода пароля
+        self.password_entry = CTk.CTkEntry(self.password_authorization_frame, width=200, show='*', 
+                                           placeholder_text='Пароль')
+        self.password_entry.grid(row=3, column=0, padx=30, pady=(0, 15))
+        
+        # Кнопка: "Войти"
+        self.login_button = CTk.CTkButton(self.password_authorization_frame, text='Войти', 
+                                          command=self.login_event, width=200)
+        self.login_button.grid(row=4, column=0, padx=30, pady=(10, 10))
+        
+        # Кнопка: "Регистрация"
+        self.registration_button = CTk.CTkButton(self.password_authorization_frame, text='Регистрация', 
+                                                 command=self.login_event, width=200)
+        self.registration_button.grid(row=5, column=0, padx=30, pady=(10, 10))
+
+
+    def login_event(self):
+        "Заглушка"
         pass
-    
 
 
 def main():
