@@ -1,7 +1,10 @@
-﻿from transitions import Machine
+﻿import tkinter as TK
+import customtkinter as CTk
+from transitions import Machine
 
+    
 
-class ProgramCore:
+class StateMachine:
     
 
     # Возможные состояния программы:
@@ -43,6 +46,67 @@ class ProgramCore:
                    { 'trigger': 'switch_to_user_profile', 
                      'source': ['keystroke_authorization', 'keystroke_extract'], 
                      'dest': 'user_profile',
-                     'after':'display_user_profile'}]
+                     'after':'display_user_profile'}]  
 
 
+    def display_password_authorization(slef):
+        print("display_password_authorization")
+
+
+    def display_registration(self):
+        print("display_registration")
+            
+
+    def display_keystroke_authorization(self):
+        print("display_keystroke_authorization")      
+    
+        
+    def display_keystroke_extract(self):
+        print("display_keystroke_extract")
+            
+
+    def display_user_profile(self):
+        print("display_user_profile")      
+
+
+
+class App(CTk.CTk):
+    
+    # Размеры окна (В пикселях)
+    WIDTH = 900
+    HEIGHT = 600
+
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        
+        
+        #self.state_machine = StateMachine()
+
+        #print(self.state_machine.state)
+        #self.state_machine.switch_to_password_authorization()
+
+        self.state_machine = StateMachine()
+        self.machine = Machine(model = self.state_machine, 
+                               states = StateMachine.states, 
+                               transitions = StateMachine.transitions, 
+                               initial = 'password_authorization')
+        
+        #print(state_machine.state)
+        #state_machine.switch_to_registration()
+        #print(state_machine.state)
+        
+        pass
+    
+
+
+def main():
+    app = App()
+    app.mainloop()
+
+
+    
+
+if __name__ == '__main__':
+    main()
