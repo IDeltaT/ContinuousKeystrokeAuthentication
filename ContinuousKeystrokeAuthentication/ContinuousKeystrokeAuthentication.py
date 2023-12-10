@@ -49,13 +49,36 @@ class StateMachine:
                      'dest': 'user_profile',
                      'after':'display_user_profile'}]  
 
+    def __init__(self):
+        self.frames = {'password_authorization_frame': 0,
+                       'registration_frame': 0}
+                
 
-    def display_password_authorization(slef):
+    def frames_setter(self, frame_name: str, frame):
+        if frame_name in self.frames.keys():
+            self.frames[frame_name] = frame
+        else:
+            print('Попытка добавить несуществующий фрейм!')
+
+
+    def forget_all_frames(self):
+        for frame in self.frames.values():
+            frame.grid_forget()
+    
+
+    def display_password_authorization(self):
         print("display_password_authorization")
+        self.forget_all_frames()
+        
+        self.frames['password_authorization_frame'].grid(row=0, column=0, sticky='ns')
 
 
     def display_registration(self):
         print("display_registration")
+        
+        self.forget_all_frames()
+        
+        self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
             
 
     def display_keystroke_authorization(self):
@@ -84,6 +107,7 @@ class App(CTk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+        
         # Инициализация машины состояний
         self.state_machine = StateMachine()
         self.machine = Machine(model = self.state_machine, 
@@ -91,7 +115,7 @@ class App(CTk.CTk):
                                transitions = StateMachine.transitions, 
                                initial = 'password_authorization')
         
-        #print(state_machine.state)
+        #print(self.state_machine.state)
         #state_machine.switch_to_registration()
         #print(state_machine.state)
 
@@ -104,7 +128,7 @@ class App(CTk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         
-        # ------------------------------ password authorization frame ------------------------------------- #
+        # --------------------------------- password authorization frame ---------------------------------- #
         # Загрузка и установка заднего фона
         self.bg_image = CTk.CTkImage(Image.open('images/bg_gradient.jpg'), size=(self.WIDTH, self.HEIGHT))
         self.bg_image_label = CTk.CTkLabel(self, text='', image=self.bg_image)
@@ -116,7 +140,10 @@ class App(CTk.CTk):
         # Создание фрейма окна авторизации
         self.password_authorization_frame = CTk.CTkFrame(self, corner_radius=0)
         self.password_authorization_frame.grid(row=0, column=0, sticky='ns')
-        
+
+        # Обеспечиваем доступ к фрейму из машины состояний
+        self.state_machine.frames_setter('password_authorization_frame', self.password_authorization_frame)
+
         # Отображение названия программы (Label)
         self.program_name_label = CTk.CTkLabel(self.password_authorization_frame, text=program_name, 
                                                font=CTk.CTkFont(size=20, weight='bold'))
@@ -124,7 +151,7 @@ class App(CTk.CTk):
         
         # Лейбл: "Авторизация"
         self.authorization_label = CTk.CTkLabel(self.password_authorization_frame, text='АВТОРИЗАЦИЯ', 
-                                               font=CTk.CTkFont(size=20, weight='bold'))
+                                                font=CTk.CTkFont(size=20, weight='bold'))
         self.authorization_label.grid(row=1, column=0, padx=30, pady=(40, 15))
   
         # Поле для ввода логина
@@ -143,9 +170,53 @@ class App(CTk.CTk):
         self.login_button.grid(row=4, column=0, padx=30, pady=(10, 10))
         
         # Кнопка: "Регистрация"
-        self.registration_button = CTk.CTkButton(self.password_authorization_frame, text='Регистрация', 
+        self.to_registration_frame_button = CTk.CTkButton(self.password_authorization_frame, 
+                                                          text='Регистрация', 
+                                                          command=self.state_machine.switch_to_registration,
+                                                          width=200)
+        self.to_registration_frame_button.grid(row=5, column=0, padx=30, pady=(10, 10))
+
+        #self.password_authorization_frame.grid_forget() # Забыть фрейм
+        #self.password_authorization_frame.grid(row=0, column=0, sticky='ns') # Разместить фрейм
+
+
+        # -------------------------------------- registration frame --------------------------------------- #
+
+        # Создание фрейма окна регистрации
+        self.registration_frame = CTk.CTkFrame(self, corner_radius=0)
+        #self.registration_frame.grid(row=0, column=0, sticky='ns')
+
+        # Обеспечиваем доступ к фрейму из машины состояний
+        self.state_machine.frames_setter('registration_frame', self.registration_frame)
+       
+        # Лейбл: "Регистрация"
+        self.program_name_label = CTk.CTkLabel(self.registration_frame, text='РЕГИСТРАЦИЯ', 
+                                               font=CTk.CTkFont(size=20, weight='bold'))
+        self.program_name_label.grid(row=0, column=0, padx=30, pady=(200, 15))
+   
+        # Поле для ввода логина
+        self.registration_username_entry = CTk.CTkEntry(self.registration_frame, width=200, 
+                                                        placeholder_text='Имя пользователя')
+        self.registration_username_entry.grid(row=1, column=0, padx=30, pady=(15, 15))
+        
+        # Поле для ввода пароля
+        self.registration_password_entry = CTk.CTkEntry(self.registration_frame, width=200, 
+                                                        placeholder_text='Пароль')
+        self.registration_password_entry.grid(row=2, column=0, padx=30, pady=(0, 15))
+
+        # Кнопка: "Зарегистрироваться"
+        self.registration_button = CTk.CTkButton(self.registration_frame, text='Зарегистрироваться', 
                                                  command=self.login_event, width=200)
-        self.registration_button.grid(row=5, column=0, padx=30, pady=(10, 10))
+        self.registration_button.grid(row=3, column=0, padx=30, pady=(10, 10))
+        
+        
+        # Кнопка: "Авторизация"
+        self.to_authorization_frame_button = CTk.CTkButton(self.registration_frame, 
+                                                           text='Авторизация', 
+                                                           command=self.state_machine.switch_to_password_authorization, 
+                                                           width=200)
+        
+        self.to_authorization_frame_button.grid(row=4, column=0, padx=30, pady=(30, 10))
 
 
     def login_event(self):
