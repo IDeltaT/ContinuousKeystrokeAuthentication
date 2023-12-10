@@ -49,9 +49,11 @@ class StateMachine:
                      'dest': 'user_profile',
                      'after':'display_user_profile'}]  
 
+
     def __init__(self):
         self.frames = {'password_authorization_frame': 0,
-                       'registration_frame': 0}
+                       'registration_frame': 0,
+                       'keystroke_authorization_frame': 0}
                 
 
     def frames_setter(self, frame_name: str, frame):
@@ -83,7 +85,10 @@ class StateMachine:
 
     def display_keystroke_authorization(self):
         print("display_keystroke_authorization")      
-    
+        self.forget_all_frames()
+        
+        self.frames['keystroke_authorization_frame'].grid(row=0, column=0, sticky='ns')
+
         
     def display_keystroke_extract(self):
         print("display_keystroke_extract")
@@ -99,27 +104,32 @@ class App(CTk.CTk):
     # Размеры окна (В пикселях)
     WIDTH = 900
     HEIGHT = 600
-
     
     CTk.set_appearance_mode("dark")         # Тема приложения по умолчанию: Темная
     CTk.set_default_color_theme("green")    # Цветовая тема приложения по умолчанию: Зеленая
     
+
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        
+
         # Инициализация машины состояний
         self.state_machine = StateMachine()
         self.machine = Machine(model = self.state_machine, 
                                states = StateMachine.states, 
                                transitions = StateMachine.transitions, 
                                initial = 'password_authorization')
-        
-        #print(self.state_machine.state)
-        #state_machine.switch_to_registration()
-        #print(state_machine.state)
 
-        
+        # Вопросы, для прохождения биометрической аутентификации по клавиатурному почерку
+        self.questions = {1: 'Чем вы любите заниматься в свободное время?',
+                          2: 'Что вам больше нравится: искусство, музыка, спорт или театр? И почему?',
+                          3: 'Опишите вид активного отдыха, которым вы любите заниматься.',
+                          4: 'Чувствуете ли вы себя комфортно и почему?',
+                          5: 'Кем Вы видите себя через пять лет?',
+                          6: 'Опишите ваше домашнее животное.',
+                          7: 'Опишите помещение, в котором Вы сейчас находитесь',}
+    
         self.title('Программное средство аутентификации пользователя на основе клавиатурного почерка')
         self.geometry(f'{self.WIDTH}x{self.HEIGHT}') # Ширина и Высота окна
         self.resizable(False, False) # Запрет на изменение размеров окна
@@ -145,39 +155,43 @@ class App(CTk.CTk):
         self.state_machine.frames_setter('password_authorization_frame', self.password_authorization_frame)
 
         # Отображение названия программы (Label)
-        self.program_name_label = CTk.CTkLabel(self.password_authorization_frame, text=program_name, 
+        self.program_name_label = CTk.CTkLabel(self.password_authorization_frame, 
+                                               text=program_name, 
                                                font=CTk.CTkFont(size=20, weight='bold'))
         self.program_name_label.grid(row=0, column=0, padx=30, pady=(60, 15))
         
         # Лейбл: "Авторизация"
-        self.authorization_label = CTk.CTkLabel(self.password_authorization_frame, text='АВТОРИЗАЦИЯ', 
+        self.authorization_label = CTk.CTkLabel(self.password_authorization_frame, 
+                                                text='АВТОРИЗАЦИЯ', 
                                                 font=CTk.CTkFont(size=20, weight='bold'))
         self.authorization_label.grid(row=1, column=0, padx=30, pady=(40, 15))
   
         # Поле для ввода логина
-        self.username_entry = CTk.CTkEntry(self.password_authorization_frame, width=200, 
+        self.username_entry = CTk.CTkEntry(self.password_authorization_frame, 
+                                           width=200, 
                                            placeholder_text='Имя пользователя')
         self.username_entry.grid(row=2, column=0, padx=30, pady=(15, 15))
         
         # Поле для ввода пароля
-        self.password_entry = CTk.CTkEntry(self.password_authorization_frame, width=200, show='*', 
+        self.password_entry = CTk.CTkEntry(self.password_authorization_frame, 
+                                           width=200, 
+                                           show='*', 
                                            placeholder_text='Пароль')
         self.password_entry.grid(row=3, column=0, padx=30, pady=(0, 15))
         
         # Кнопка: "Войти"
-        self.login_button = CTk.CTkButton(self.password_authorization_frame, text='Войти', 
-                                          command=self.login_event, width=200)
+        self.login_button = CTk.CTkButton(self.password_authorization_frame, 
+                                          text='Войти', 
+                                          command=self.state_machine.switch_to_keystroke_authorization, 
+                                          width=200)
         self.login_button.grid(row=4, column=0, padx=30, pady=(10, 10))
         
         # Кнопка: "Регистрация"
-        self.to_registration_frame_button = CTk.CTkButton(self.password_authorization_frame, 
+        self.PassAuth_to_Reg_frame_button = CTk.CTkButton(self.password_authorization_frame, 
                                                           text='Регистрация', 
                                                           command=self.state_machine.switch_to_registration,
                                                           width=200)
-        self.to_registration_frame_button.grid(row=5, column=0, padx=30, pady=(10, 10))
-
-        #self.password_authorization_frame.grid_forget() # Забыть фрейм
-        #self.password_authorization_frame.grid(row=0, column=0, sticky='ns') # Разместить фрейм
+        self.PassAuth_to_Reg_frame_button.grid(row=5, column=0, padx=30, pady=(10, 10))
 
 
         # -------------------------------------- registration frame --------------------------------------- #
@@ -190,9 +204,9 @@ class App(CTk.CTk):
         self.state_machine.frames_setter('registration_frame', self.registration_frame)
        
         # Лейбл: "Регистрация"
-        self.program_name_label = CTk.CTkLabel(self.registration_frame, text='РЕГИСТРАЦИЯ', 
+        self.registration_frame_name_label = CTk.CTkLabel(self.registration_frame, text='РЕГИСТРАЦИЯ', 
                                                font=CTk.CTkFont(size=20, weight='bold'))
-        self.program_name_label.grid(row=0, column=0, padx=30, pady=(200, 15))
+        self.registration_frame_name_label.grid(row=0, column=0, padx=30, pady=(200, 15))
    
         # Поле для ввода логина
         self.registration_username_entry = CTk.CTkEntry(self.registration_frame, width=200, 
@@ -211,16 +225,56 @@ class App(CTk.CTk):
         
         
         # Кнопка: "Авторизация"
-        self.to_authorization_frame_button = CTk.CTkButton(self.registration_frame, 
-                                                           text='Авторизация', 
-                                                           command=self.state_machine.switch_to_password_authorization, 
-                                                           width=200)
+        self.Reg_to_PassAuth_frame_button = CTk.CTkButton(self.registration_frame, 
+                                                          text='Авторизация', 
+                                                          command=self.state_machine.switch_to_password_authorization, 
+                                                          width=200)      
+        self.Reg_to_PassAuth_frame_button.grid(row=4, column=0, padx=30, pady=(30, 10))
+
+
+        # --------------------------------- keystroke authorization frame --------------------------------- #
+
+        # Создание фрейма окна авторизации по клавиатурному почерку
+        self.keystroke_authorization_frame = CTk.CTkFrame(self, corner_radius=0)
+        #self.keystroke_authorization_frame.grid(row=0, column=0, sticky='ns')
+
+        # Обеспечиваем доступ к фрейму из машины состояний
+        self.state_machine.frames_setter('keystroke_authorization_frame', self.keystroke_authorization_frame)
         
-        self.to_authorization_frame_button.grid(row=4, column=0, padx=30, pady=(30, 10))
+        KeyAuth_frame_name_text = 'АУТЕНТИФИКАЦИЯ ПО КЛАВИАТУРНОМУ ПОЧЕРКУ'
+        # Лейбл: "Аутентификация по клавиатурному почерку"
+        self.keystroke_authorization_frame_name_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
+                                                                     text=KeyAuth_frame_name_text, 
+                                                                     font=CTk.CTkFont(size=20, weight='bold'))
+        self.keystroke_authorization_frame_name_label.grid(row=0, column=0, padx=30, pady=(40, 15))
+
+        KeyAuth_frame_instruction_text = 'для успешного прохождения данного этапа аутентификации,\n\
+посторайтесь дать развернутые ответы на поставленные вопросы\n(при необходимости, можно заменить вопрос)\n\n\
+ВОПРОСЫ:'
+        # Лейбл: "Для успешного прохождения данного этапа аутентификации, посторайтесь дать развернутые ответы на поставленные вопросы"
+        self.keystroke_authorization_frame_name_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
+                                                                     text=KeyAuth_frame_instruction_text, 
+                                                                     font=CTk.CTkFont(size=18, weight='bold'))
+        self.keystroke_authorization_frame_name_label.grid(row=1, column=0, padx=30, pady=(10, 10))
+        
+
+
+        # create textbox
+        self.textbox = CTk.CTkTextbox(self.keystroke_authorization_frame, width=500, height=130)
+        self.textbox.grid(row=2, column=0, padx=(20, 20), pady=(10, 20))
+        self.textbox.configure(state="disabled")
+        # Кнопка: "Вернутся"
+        self.KeyAuth_to_PassAuth_frame_button = CTk.CTkButton(self.keystroke_authorization_frame, 
+                                                              text='Вернуться', 
+                                                              command=self.state_machine.switch_to_password_authorization, 
+                                                              width=200)
+        self.KeyAuth_to_PassAuth_frame_button.grid(row=3, column=0, padx=30, pady=(30, 10))
+        
+
 
 
     def login_event(self):
-        "Заглушка"
+        # "Заглушка"
         pass
 
 
