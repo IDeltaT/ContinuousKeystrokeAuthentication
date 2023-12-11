@@ -319,10 +319,10 @@ class App(CTk.CTk):
         self.KeyAuth_question_control_frame.grid(row=3, column=0, padx=0, pady=(3, 10))
         
         # Button: "<" Предыдущий вопрос
+        args = lambda: self.display_previous_question(self.KeyAuth_question_counter_label, self.KeyAuth_questions_textbox)
         self.previous_question_button = CTk.CTkButton(self.KeyAuth_question_control_frame, 
                                                       text='<', 
-                                                      command=lambda: self.display_previous_question(self.KeyAuth_question_counter_label,
-                                                                                                     self.KeyAuth_questions_textbox),
+                                                      command=args,
                                                       width=30,
                                                       font=CTk.CTkFont(size=20, weight='bold'))
         self.previous_question_button.grid(row=0, column=0, padx=5, pady=(3, 5))
@@ -426,10 +426,10 @@ class App(CTk.CTk):
         self.KeyExtr_question_control_frame.grid(row=3, column=0, padx=0, pady=(3, 10))
         
         # Button: "<" Предыдущий вопрос
+        args = lambda: self.display_previous_question(self.KeyExtr_question_counter_label, self.KeyExtr_questions_textbox)
         self.previous_question_button = CTk.CTkButton(self.KeyExtr_question_control_frame, 
                                                       text='<', 
-                                                      command=lambda: self.display_previous_question(self.KeyExtr_question_counter_label, 
-                                                                                                     self.KeyExtr_questions_textbox),
+                                                      command=args,
                                                       width=30,
                                                       font=CTk.CTkFont(size=20, weight='bold'))
         self.previous_question_button.grid(row=0, column=0, padx=5, pady=(3, 5))
