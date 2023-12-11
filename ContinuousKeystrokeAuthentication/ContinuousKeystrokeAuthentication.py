@@ -469,10 +469,28 @@ class App(CTk.CTk):
 
         # Создание фрейма профиля пользователя
         self.user_profile_frame = CTk.CTkFrame(self, corner_radius=0)
+        self.user_profile_frame.grid_rowconfigure(0, weight=1)
         #self.user_profile_frame.grid(row=0, column=0, sticky='ns')
-
+            
         # Обеспечиваем доступ к фрейму из машины состояний
         self.state_machine.frames_setter('user_profile_frame', self.user_profile_frame)
+        
+        # Создание подфрейма, содержащего настройки
+        self.settings_frame = CTk.CTkFrame(self.user_profile_frame, corner_radius=0)
+        self.settings_frame.grid(row=0, column=0, sticky='ns')
+ 
+
+        # Лейбл: ПРОФИЛЬ
+        self.settings_frame_profile_label = CTk.CTkLabel(self.settings_frame, 
+                                                         text='ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ', 
+                                                         font=CTk.CTkFont(size=18, weight='bold'))
+        self.settings_frame_profile_label.grid(row=0, column=0, padx=30, pady=(5, 5))
+
+
+        # Создание подфрейма, содержащего логи
+        self.logs_frame = CTk.CTkFrame(self.user_profile_frame, corner_radius=0, fg_color='transparent')
+        self.logs_frame.grid(row=0, column=1, sticky='ns')
+        
         
         #####################################################################################################
 
@@ -485,9 +503,10 @@ class App(CTk.CTk):
 
         self.KeyAuth_progressbar.set(progressbar_new_value)
         
-        print(f'{self.characters_counter} / {self.authentication_required_characters}')
+        print(f'{self.characters_counter} / {self.authentication_required_characters}') # Debug
 
         if self.characters_counter >= self.authentication_required_characters:
+            self.focus() # Убрать фокус с текстбокса
             self.state_machine.switch_to_user_profile()
   
         
