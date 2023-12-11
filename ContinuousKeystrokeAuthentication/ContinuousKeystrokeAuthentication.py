@@ -158,6 +158,18 @@ class App(CTk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         
+        self.current_user = 'IKSuser'
+
+        self.alert_CheckBox_BooleanVar = CTk.BooleanVar()
+        self.alert_CheckBox_BooleanVar.set(True)
+        
+        self.block_CheckBox_BooleanVar = CTk.BooleanVar()
+        self.block_CheckBox_BooleanVar.set(True)
+        
+        self.ContAuth_Switch_BooleanVar = CTk.BooleanVar()
+        self.ContAuth_Switch_BooleanVar.set(True)
+        
+        
         # --------------------------------- password authorization frame ---------------------------------- #
         # Загрузка и установка заднего фона
         self.bg_image = CTk.CTkImage(Image.open('images/bg_gradient.jpg'), size=(self.WIDTH, self.HEIGHT))
@@ -480,11 +492,113 @@ class App(CTk.CTk):
         self.settings_frame.grid(row=0, column=0, sticky='ns')
  
 
-        # Лейбл: ПРОФИЛЬ
+        # Лейбл: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
         self.settings_frame_profile_label = CTk.CTkLabel(self.settings_frame, 
                                                          text='ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ', 
-                                                         font=CTk.CTkFont(size=18, weight='bold'))
-        self.settings_frame_profile_label.grid(row=0, column=0, padx=30, pady=(5, 5))
+                                                         font=CTk.CTkFont(size=20, weight='bold'))
+        self.settings_frame_profile_label.grid(row=0, column=0, padx=30, pady=(15, 15))
+
+
+        # Создание подфрейма, содержащего имя текущего пользовтеля
+        self.settings_current_user_frame = CTk.CTkFrame(self.settings_frame, 
+                                                        corner_radius=0)
+        self.settings_current_user_frame.grid(row=1, column=0, sticky='nswe')
+        
+        self.user_image = CTk.CTkImage(Image.open('images/UserImage.png'), size=(48, 48))
+        
+        self.settings_frame_current_user_image = CTk.CTkLabel(self.settings_current_user_frame, 
+                                                              text='', 
+                                                              image=self.user_image,
+                                                              font=CTk.CTkFont(size=18, weight='bold'))
+        self.settings_frame_current_user_image.grid(row=0, column=0, padx=(30,5), pady=(5, 5), sticky='nsw')
+        
+
+        self.settings_frame_current_user_label = CTk.CTkLabel(self.settings_current_user_frame, 
+                                                              text=f'{self.current_user}', 
+                                                              font=CTk.CTkFont(size=18, weight='bold'))
+        self.settings_frame_current_user_label.grid(row=0, column=1, padx=5, pady=(5, 5), sticky='nsw')
+
+
+        # Лейбл: настройки
+        self.settings_frame_settings_label = CTk.CTkLabel(self.settings_frame, 
+                                                          text='НАСТРОЙКИ:', 
+                                                          font=CTk.CTkFont(size=18, weight='bold'))
+        self.settings_frame_settings_label.grid(row=2, column=0, padx=0, pady=(25, 5))
+
+
+        # Кнопка: "Сбросить модель"
+        self.settings_frame_reset_model_button = CTk.CTkButton(self.settings_frame, 
+                                                               text='сбросить модель', 
+                                                               command=self.login_event, 
+                                                               width=200,
+                                                               font=CTk.CTkFont(size=14, weight='bold'))
+        self.settings_frame_reset_model_button.grid(row=3, column=0, padx=0, pady=(10, 10))
+        
+
+        # Кнопка: "Изменить пароль"
+        self.settings_frame_change_password_button = CTk.CTkButton(self.settings_frame, 
+                                                                   text='изменить пароль', 
+                                                                   command=self.login_event, 
+                                                                   width=200,
+                                                                   font=CTk.CTkFont(size=14, weight='bold'))
+        self.settings_frame_change_password_button.grid(row=4, column=0, padx=0, pady=(10, 10))
+        
+
+        # Лейбл: допустимое отклонение
+        self.settings_frame_tolerance_label = CTk.CTkLabel(self.settings_frame, 
+                                                          text='допустимое отклонение:', 
+                                                          font=CTk.CTkFont(size=14, weight='bold'))
+        self.settings_frame_tolerance_label.grid(row=5, column=0, padx=0, pady=(5, 0))
+        
+        
+        # Опциональное меню: Допустимое отклонение (стандартное/увеличенное)
+        self.settings_frame_tolerance_mode = CTk.CTkOptionMenu(self.settings_frame, 
+                                                               dynamic_resizing=False,
+                                                               values=['стандартное', 'увеличенное'],
+                                                               width=200,
+                                                               font=CTk.CTkFont(size=14, weight='bold'))
+        self.settings_frame_tolerance_mode.grid(row=6, column=0, padx=0, pady=(5, 10))
+        
+
+        # Создание подфрейма (Выбор действий, при обнаружении "Чужого" - предупреждений и/или блокирование)
+        self.actions_frame = CTk.CTkFrame(self.settings_frame, corner_radius=10)
+        self.actions_frame.grid(row=7, column=0, pady=(8, 0))
+
+        # Лейбл: действия при обнаружении "Чужого"
+        self.settings_frame_tolerance_label = CTk.CTkLabel(self.actions_frame, 
+                                                          text='действия при\nобнаружении "Чужого":', 
+                                                          font=CTk.CTkFont(size=14, weight='bold'))
+        self.settings_frame_tolerance_label.grid(row=0, column=0, padx=12, pady=(8, 3))
+        
+        # CheckBox: включает/отключает отображение предупреждения при обнаружении "Чужого"
+        self.action_alert_CheckBox = CTk.CTkCheckBox(master=self.actions_frame, 
+                                                     text='предупреждение',
+                                                     variable=self.alert_CheckBox_BooleanVar,
+                                                     font=CTk.CTkFont(size=14, weight='bold'))
+        self.action_alert_CheckBox.grid(row=1, column=0, pady=(10, 0), padx=20, sticky='nsw')
+
+        # CheckBox: включает/отключает блокирование машины при обнаружении "Чужого"
+        self.action_block_CheckBox = CTk.CTkCheckBox(master=self.actions_frame, 
+                                                     text='блокирование',
+                                                     variable=self.block_CheckBox_BooleanVar,
+                                                     font=CTk.CTkFont(size=14, weight='bold'))
+        self.action_block_CheckBox.grid(row=2, column=0, pady=(10, 10), padx=20, sticky='nsw')
+        
+        # Switch: включает/отключает непрерывную аутентификацию по клавиатурному почерку
+        self.settings_frame_ContAuth_Switch = CTk.CTkSwitch(master=self.settings_frame, 
+                                                            text='     непрерывная\n  аутентификация',
+                                                            variable=self.ContAuth_Switch_BooleanVar,
+                                                            font=CTk.CTkFont(size=13, weight='bold'))
+        self.settings_frame_ContAuth_Switch.grid(row=8, column=0, pady=(15, 10))
+
+
+        # Кнопка: "Выйти"
+        self.settings_frame_logout_button = CTk.CTkButton(self.settings_frame, 
+                                                                   text='выйти', 
+                                                                   command=self.login_event, 
+                                                                   width=200,
+                                                                   font=CTk.CTkFont(size=14, weight='bold'))
+        self.settings_frame_logout_button.grid(row=9, column=0, padx=0, pady=(10, 10))
 
 
         # Создание подфрейма, содержащего логи
