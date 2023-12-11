@@ -50,13 +50,15 @@ class StateMachine:
                      'after':'display_user_profile'}]  
 
 
-    def __init__(self):
+    def __init__(self, app):
         self.frames = {'password_authorization_frame': 0,
                        'registration_frame': 0,
                        'keystroke_authorization_frame': 0,
                        'keystroke_extract_frame': 0,
                        'user_profile_frame': 0}
                 
+        self.app = app # Доступ к переменным приложения
+        
 
     def frames_setter(self, frame_name: str, frame):
         if frame_name in self.frames.keys():
@@ -73,13 +75,12 @@ class StateMachine:
     def display_password_authorization(self):
         print('display_password_authorization')
         self.forget_all_frames()
-        
+
         self.frames['password_authorization_frame'].grid(row=0, column=0, sticky='ns')
 
 
     def display_registration(self):
         print('display_registration')
-        
         self.forget_all_frames()
         
         self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
@@ -87,7 +88,8 @@ class StateMachine:
 
     def display_keystroke_authorization(self):
         print('display_keystroke_authorization')      
-        self.characters_counter = 0 # Сбросить кол-во введенных символов
+        self.app.characters_counter = 0 # Сбросить кол-во введенных символов
+        self.app.current_question = 0
         
         self.forget_all_frames()        
 
@@ -96,7 +98,8 @@ class StateMachine:
         
     def display_keystroke_extract(self):
         print('display_keystroke_extract')
-        self.characters_counter = 0 # Сбросить кол-во введенных символов
+        self.app.characters_counter = 0 # Сбросить кол-во введенных символов
+        self.app.current_question = 0
         
         self.forget_all_frames()
         
@@ -128,7 +131,7 @@ class App(CTk.CTk):
         
 
         # Инициализация машины состояний
-        self.state_machine = StateMachine()
+        self.state_machine = StateMachine(self)
         self.machine = Machine(model = self.state_machine, 
                                states = StateMachine.states, 
                                transitions = StateMachine.transitions, 
@@ -630,7 +633,7 @@ class App(CTk.CTk):
         print(f'{self.characters_counter} / {self.authentication_required_characters}') # Debug
 
         if self.characters_counter >= self.authentication_required_characters:
-            self.focus() # Убрать фокус с текстбокса
+            self.focus() # Убрать фокус с TextBox'а
             self.state_machine.switch_to_user_profile()
   
         
@@ -647,13 +650,13 @@ class App(CTk.CTk):
         self.current_question = ((self.current_question + 1) % self.questions_number)
         label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
-        # Активировать ТекстБокс
+        # Активировать TextBox
         textbox.configure(state='normal') 
-        # Отчистка ТекстБокса
+        # Отчистка TextBox'а
         textbox.delete('1.0', CTk.END) 
-        # Вставка вопроса в ТекстБокс
+        # Вставка вопроса в TextBox
         textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
-        # Деактивировать ТекстБокс
+        # Деактивировать TextBox
         textbox.configure(state='disabled') 
 
 
@@ -661,13 +664,13 @@ class App(CTk.CTk):
         self.current_question = ((self.current_question - 1) % self.questions_number)
         label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
-        # Активировать ТекстБокс
+        # Активировать TextBox
         textbox.configure(state='normal')         
-        # Отчистка ТекстБокса
+        # Отчистка TextBox'а
         textbox.delete('1.0', CTk.END) 
-        # Вставка вопроса в ТекстБокс
+        # Вставка вопроса в TextBox
         textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
-        # Деактивировать ТекстБокс
+        # Деактивировать TextBox
         textbox.configure(state='disabled')        
 
 
