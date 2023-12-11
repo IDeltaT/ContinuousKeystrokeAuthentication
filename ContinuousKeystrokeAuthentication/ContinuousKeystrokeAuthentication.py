@@ -87,13 +87,17 @@ class StateMachine:
 
     def display_keystroke_authorization(self):
         print("display_keystroke_authorization")      
-        self.forget_all_frames()
+        self.characters_counter = 0 # Сбросить кол-во введенных символов
         
+        self.forget_all_frames()        
+
         self.frames['keystroke_authorization_frame'].grid(row=0, column=0, sticky='ns')
 
         
     def display_keystroke_extract(self):
         print("display_keystroke_extract")
+        self.characters_counter = 0 # Сбросить кол-во введенных символов
+        
         self.forget_all_frames()
         
         self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
@@ -138,6 +142,9 @@ class App(CTk.CTk):
         self.current_question = 0
         self.questions_number = len(self.questions)
 
+        self.characters_counter = 0      
+        self.authentication_required_characters = 20
+        self.registration_required_characters = 200
 
         self.title('Программное средство аутентификации пользователя на основе клавиатурного почерка')
         self.geometry(f'{self.WIDTH}x{self.HEIGHT}') # Ширина и Высота окна
@@ -327,6 +334,8 @@ class App(CTk.CTk):
         self.KeyAuth_answers_textbox.grid(row=5, column=0, padx=(20, 20), pady=(5, 0))      
         self.KeyAuth_answers_textbox.delete('1.0', CTk.END) # Отчистка ТекстБокса
         
+        self.KeyAuth_answers_textbox.bind('<KeyPress>', self.press_key_event_KeyAuthFrame)
+
         # CTk 5.2.1 - Фокус на ТекстБоксе все еще не работает
         self.KeyAuth_answers_textbox.focus() # Фокус на ТекстБоксе
         #self.KeyAuth_answers_textbox.focus_set() # Альтернативный Фокус на ТекстБоксе
@@ -336,7 +345,7 @@ class App(CTk.CTk):
         self.KeyAuth_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
         #self.KeyAuth_progressbar.configure(mode="indeterminnate")
         self.KeyAuth_progressbar.configure(mode="determinate")
-        self.KeyAuth_progressbar.set(0.2)
+        self.KeyAuth_progressbar.set(0)
         #self.KeyAuth_progressbar.start()
         
         # Кнопка: "Вернутся"
@@ -431,6 +440,8 @@ class App(CTk.CTk):
         self.KeyExtr_answers_textbox.grid(row=5, column=0, padx=(20, 20), pady=(5, 0))      
         self.KeyExtr_answers_textbox.delete('1.0', CTk.END) # Отчистка ТекстБокса
         
+        self.KeyExtr_answers_textbox.bind('<KeyPress>', self.press_key_event_KeyExtrFrame)
+
         # CTk 5.2.1 - Фокус на ТекстБоксе все еще не работает
         self.KeyExtr_answers_textbox.focus() # Фокус на ТекстБоксе
         #self.KeyExtr_answers_textbox.focus_set() # Альтернативный Фокус на ТекстБоксе
@@ -440,7 +451,7 @@ class App(CTk.CTk):
         self.KeyExtr_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
         #self.KeyAuth_progressbar.configure(mode="indeterminnate")
         self.KeyExtr_progressbar.configure(mode="determinate")
-        self.KeyExtr_progressbar.set(0.2)
+        self.KeyExtr_progressbar.set(0)
         
         # Кнопка: "Вернутся"
         self.KeyExtr_to_PassAuth_frame_button = CTk.CTkButton(self.keystroke_extract_frame, 
@@ -450,6 +461,24 @@ class App(CTk.CTk):
         self.KeyExtr_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(20, 10))
         #####################################################################################################
 
+
+    def press_key_event_KeyAuthFrame(self, event):
+        print(event) # <KeyPress event send_event=True state=Mod1 keysym=w keycode=87 char='w' x=275 y=46>
+        self.characters_counter += 1
+            
+        progressbar_new_value = self.characters_counter / self.authentication_required_characters
+
+        self.KeyAuth_progressbar.set(progressbar_new_value)
+  
+        
+    def press_key_event_KeyExtrFrame(self, event):
+        print(event) # <KeyPress event send_event=True state=Mod1 keysym=w keycode=87 char='w' x=275 y=46>
+        self.characters_counter += 1
+            
+        progressbar_new_value = self.characters_counter / self.registration_required_characters
+
+        self.KeyExtr_progressbar.set(progressbar_new_value)
+        
 
     def display_next_question(self, label, textbox):
         self.current_question = ((self.current_question + 1) % self.questions_number)
