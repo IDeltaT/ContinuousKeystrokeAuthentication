@@ -54,8 +54,8 @@ class StateMachine:
         self.frames = {'password_authorization_frame': 0,
                        'registration_frame': 0,
                        'keystroke_authorization_frame': 0,
-                       'keystroke_extract_frame': 0,}
-        # 'user_profile_frame': 0
+                       'keystroke_extract_frame': 0,
+                       'user_profile_frame': 0}
                 
 
     def frames_setter(self, frame_name: str, frame):
@@ -104,7 +104,11 @@ class StateMachine:
 
 
     def display_user_profile(self):
-        print("display_user_profile")      
+        print("display_user_profile")  
+        
+        self.forget_all_frames()
+
+        self.frames['user_profile_frame'].grid(row=0, column=0, sticky='ns')
 
 
 
@@ -459,6 +463,17 @@ class App(CTk.CTk):
                                                               command=self.state_machine.switch_to_password_authorization, 
                                                               width=200)
         self.KeyExtr_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(20, 10))
+        
+
+        # -------------------------------------- user profile frame --------------------------------------- #
+
+        # Создание фрейма профиля пользователя
+        self.user_profile_frame = CTk.CTkFrame(self, corner_radius=0)
+        #self.user_profile_frame.grid(row=0, column=0, sticky='ns')
+
+        # Обеспечиваем доступ к фрейму из машины состояний
+        self.state_machine.frames_setter('user_profile_frame', self.user_profile_frame)
+        
         #####################################################################################################
 
 
@@ -469,6 +484,9 @@ class App(CTk.CTk):
         progressbar_new_value = self.characters_counter / self.authentication_required_characters
 
         self.KeyAuth_progressbar.set(progressbar_new_value)
+        
+        if self.characters_counter >= self.authentication_required_characters:
+            self.state_machine.switch_to_user_profile
   
         
     def press_key_event_KeyExtrFrame(self, event):
