@@ -416,6 +416,38 @@ class App(CTk.CTk):
                                                   font=CTk.CTkFont(size=20, weight='bold'))
         self.next_question_button.grid(row=0, column=2, padx=5, pady=(3, 5))
 
+        # Лейбл: Ответы
+        self.KeyExtr_answers_label = CTk.CTkLabel(self.keystroke_extract_frame, 
+                                                  text='ПОЛЕ, ДЛЯ ВВОДА ОТВЕТОВ:', 
+                                                  font=CTk.CTkFont(size=18, weight='bold'))
+        self.KeyExtr_answers_label.grid(row=4, column=0, padx=30, pady=(5, 5))
+
+        # ТекстБокс: Предназначен для ввода ответов
+        self.KeyExtr_answers_textbox = CTk.CTkTextbox(self.keystroke_extract_frame, 
+                                                      width=500, 
+                                                      height=100,
+                                                      wrap=CTk.WORD,
+                                                      font=CTk.CTkFont(size=16, weight='bold'))
+        self.KeyExtr_answers_textbox.grid(row=5, column=0, padx=(20, 20), pady=(5, 0))      
+        self.KeyExtr_answers_textbox.delete('1.0', CTk.END) # Отчистка ТекстБокса
+        
+        # CTk 5.2.1 - Фокус на ТекстБоксе все еще не работает
+        self.KeyExtr_answers_textbox.focus() # Фокус на ТекстБоксе
+        #self.KeyExtr_answers_textbox.focus_set() # Альтернативный Фокус на ТекстБоксе
+        #self.KeyExtr_answers_textbox.focus_force() # Альтернативный Фокус на ТекстБоксе
+
+        self.KeyExtr_progressbar = CTk.CTkProgressBar(self.keystroke_extract_frame)
+        self.KeyExtr_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
+        #self.KeyAuth_progressbar.configure(mode="indeterminnate")
+        self.KeyExtr_progressbar.configure(mode="determinate")
+        self.KeyExtr_progressbar.set(0.2)
+        
+        # Кнопка: "Вернутся"
+        self.KeyExtr_to_PassAuth_frame_button = CTk.CTkButton(self.keystroke_extract_frame, 
+                                                              text='Вернуться', 
+                                                              command=self.state_machine.switch_to_password_authorization, 
+                                                              width=200)
+        self.KeyExtr_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(20, 10))
         #####################################################################################################
 
 
