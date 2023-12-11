@@ -485,8 +485,10 @@ class App(CTk.CTk):
 
         self.KeyAuth_progressbar.set(progressbar_new_value)
         
+        print(f'{self.characters_counter} / {self.authentication_required_characters}')
+
         if self.characters_counter >= self.authentication_required_characters:
-            self.state_machine.switch_to_user_profile
+            self.state_machine.switch_to_user_profile()
   
         
     def press_key_event_KeyExtrFrame(self, event):
