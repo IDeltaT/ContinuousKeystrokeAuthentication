@@ -53,7 +53,9 @@ class StateMachine:
     def __init__(self):
         self.frames = {'password_authorization_frame': 0,
                        'registration_frame': 0,
-                       'keystroke_authorization_frame': 0}
+                       'keystroke_authorization_frame': 0,
+                       'keystroke_extract_frame': 0,}
+        # 'user_profile_frame': 0
                 
 
     def frames_setter(self, frame_name: str, frame):
@@ -92,7 +94,10 @@ class StateMachine:
         
     def display_keystroke_extract(self):
         print("display_keystroke_extract")
-            
+        self.forget_all_frames()
+        
+        self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
+
 
     def display_user_profile(self):
         print("display_user_profile")      
@@ -223,8 +228,10 @@ class App(CTk.CTk):
         self.registration_password_entry.grid(row=2, column=0, padx=30, pady=(0, 15))
 
         # Кнопка: "Зарегистрироваться"
-        self.registration_button = CTk.CTkButton(self.registration_frame, text='Зарегистрироваться', 
-                                                 command=self.login_event, width=200)
+        self.registration_button = CTk.CTkButton(self.registration_frame, 
+                                                 text='Зарегистрироваться', 
+                                                 command=self.state_machine.switch_to_keystroke_extract, 
+                                                 width=200)
         self.registration_button.grid(row=3, column=0, padx=30, pady=(10, 10))
         
         
@@ -256,12 +263,10 @@ class App(CTk.CTk):
 посторайтесь дать развернутые ответы на поставленные вопросы\n(при необходимости, можно заменить вопрос)\n\n\
 ВОПРОСЫ:'
         # Лейбл: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
-        self.keystroke_authorization_frame_name_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
-                                                                     text=KeyAuth_frame_instruction_text, 
-                                                                     font=CTk.CTkFont(size=18, weight='bold'))
-        self.keystroke_authorization_frame_name_label.grid(row=1, column=0, padx=30, pady=(10, 5))
-        
-
+        self.KeyAuth_instruction_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
+                                                      text=KeyAuth_frame_instruction_text, 
+                                                      font=CTk.CTkFont(size=18, weight='bold'))
+        self.KeyAuth_instruction_label.grid(row=1, column=0, padx=30, pady=(10, 5))
 
         # ТекстБокс: Содержит вопросы
         self.KeyAuth_questions_textbox = CTk.CTkTextbox(self.keystroke_authorization_frame, 
@@ -286,21 +291,23 @@ class App(CTk.CTk):
         # Кнопка: "<" Предыдущий вопрос
         self.previous_question_button = CTk.CTkButton(self.KeyAuth_question_control_frame, 
                                                       text='<', 
-                                                      command=self.display_previous_question, 
+                                                      command=lambda: self.display_previous_question(self.KeyAuth_question_counter_label,
+                                                                                                     self.KeyAuth_questions_textbox),
                                                       width=30,
                                                       font=CTk.CTkFont(size=20, weight='bold'))
         self.previous_question_button.grid(row=0, column=0, padx=5, pady=(3, 5))
         
         # Лейбл: Текущий вопрос / Всего вопросов
         self.KeyAuth_question_counter_label = CTk.CTkLabel(self.KeyAuth_question_control_frame, 
-                                                                     text=f'{self.current_question + 1}/{self.questions_number}', 
-                                                                     font=CTk.CTkFont(size=18, weight='bold'))
+                                                           text=f'{self.current_question + 1}/{self.questions_number}', 
+                                                           font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyAuth_question_counter_label.grid(row=0, column=1, padx=5, pady=(3, 5))        
         
         # Кнопка: ">" Следующий вопрос
         self.next_question_button = CTk.CTkButton(self.KeyAuth_question_control_frame, 
                                                   text='>', 
-                                                  command=self.display_next_question, 
+                                                  command=lambda: self.display_next_question(self.KeyAuth_question_counter_label,
+                                                                                             self.KeyAuth_questions_textbox),
                                                   width=30,
                                                   font=CTk.CTkFont(size=20, weight='bold'))
         self.next_question_button.grid(row=0, column=2, padx=5, pady=(3, 5))
@@ -342,33 +349,102 @@ class App(CTk.CTk):
 
         # ------------------------------------ keystroke extract frame ------------------------------------ #
 
+        # Создание фрейма окна извлечения ритма нажатия клавиш польователя, для последующего обечения модели
+        self.keystroke_extract_frame = CTk.CTkFrame(self, corner_radius=0)
+        #self.keystroke_extract_frame.grid(row=0, column=0, sticky='ns')
 
-    def display_next_question(self):
+        # Обеспечиваем доступ к фрейму из машины состояний
+        self.state_machine.frames_setter('keystroke_extract_frame', self.keystroke_extract_frame)
+        
+        KeyExtr_frame_name_text = 'ЭКСТРАКТОР ПРИЗНАКОВ'
+        # Лейбл: "Экстрактор признаков"
+        self.KeyExtr_frame_name_label = CTk.CTkLabel(self.keystroke_extract_frame, 
+                                                     text=KeyExtr_frame_name_text, 
+                                                     font=CTk.CTkFont(size=20, weight='bold'))
+        self.KeyExtr_frame_name_label.grid(row=0, column=0, padx=30, pady=(20, 10))
+
+        KeyExtr_frame_instruction_text = 'для успешного обучения искусственной нейронной сети\n\
+определять вас как "Своего" и блокировать доступ\n"Чужому", вам следует отвечать на заданные вопросы,\n\
+пока не заполнится шкала (вопросы можно менять)\n\nВОПРОСЫ:'
+        # Лейбл: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
+        self.KeyExtr_frame_instruction_label = CTk.CTkLabel(self.keystroke_extract_frame, 
+                                                            text=KeyExtr_frame_instruction_text, 
+                                                            font=CTk.CTkFont(size=18, weight='bold'))
+        self.KeyExtr_frame_instruction_label.grid(row=1, column=0, padx=30, pady=(10, 5))
+        
+        # ТекстБокс: Содержит вопросы
+        self.KeyExtr_questions_textbox = CTk.CTkTextbox(self.keystroke_extract_frame, 
+                                                        width=500, 
+                                                        height=100,
+                                                        wrap=CTk.WORD,
+                                                        font=CTk.CTkFont(size=16, weight='bold'))
+        self.KeyExtr_questions_textbox.grid(row=2, column=0, padx=(20, 20), pady=(5, 0))
+        # Отчистка ТекстБокса
+        self.KeyExtr_questions_textbox.delete('1.0', CTk.END)
+        # Вставка вопроса в ТекстБокс
+        self.KeyExtr_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
+        self.KeyExtr_questions_textbox.configure(state="disabled") # Деактивировать ТекстБокс       
+        
+
+        # Создание фрейма, содержащего элементы управления перелистывания вопросов
+        self.KeyExtr_question_control_frame = CTk.CTkFrame(self.keystroke_extract_frame, 
+                                                           corner_radius=0,
+                                                           fg_color='transparent')
+        self.KeyExtr_question_control_frame.grid(row=3, column=0, padx=0, pady=(3, 10))
+        
+        # Кнопка: "<" Предыдущий вопрос
+        self.previous_question_button = CTk.CTkButton(self.KeyExtr_question_control_frame, 
+                                                      text='<', 
+                                                      command=lambda: self.display_previous_question(self.KeyExtr_question_counter_label, 
+                                                                                                     self.KeyExtr_questions_textbox),
+                                                      width=30,
+                                                      font=CTk.CTkFont(size=20, weight='bold'))
+        self.previous_question_button.grid(row=0, column=0, padx=5, pady=(3, 5))
+        
+        # Лейбл: Текущий вопрос / Всего вопросов
+        self.KeyExtr_question_counter_label = CTk.CTkLabel(self.KeyExtr_question_control_frame, 
+                                                           text=f'{self.current_question + 1}/{self.questions_number}', 
+                                                           font=CTk.CTkFont(size=18, weight='bold'))
+        self.KeyExtr_question_counter_label.grid(row=0, column=1, padx=5, pady=(3, 5))        
+        
+        # Кнопка: ">" Следующий вопрос
+        self.next_question_button = CTk.CTkButton(self.KeyExtr_question_control_frame, 
+                                                  text='>', 
+                                                  command=lambda: self.display_next_question(self.KeyExtr_question_counter_label, 
+                                                                                             self.KeyExtr_questions_textbox), 
+                                                  width=30,
+                                                  font=CTk.CTkFont(size=20, weight='bold'))
+        self.next_question_button.grid(row=0, column=2, padx=5, pady=(3, 5))
+
+        #####################################################################################################
+
+
+    def display_next_question(self, label, textbox):
         self.current_question = ((self.current_question + 1) % self.questions_number)
-        self.KeyAuth_question_counter_label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
+        label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
         # Активировать ТекстБокс
-        self.KeyAuth_questions_textbox.configure(state="normal") 
+        textbox.configure(state="normal") 
         # Отчистка ТекстБокса
-        self.KeyAuth_questions_textbox.delete('1.0', CTk.END) 
+        textbox.delete('1.0', CTk.END) 
         # Вставка вопроса в ТекстБокс
-        self.KeyAuth_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
+        textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
         # Деактивировать ТекстБокс
-        self.KeyAuth_questions_textbox.configure(state="disabled") 
+        textbox.configure(state="disabled") 
 
 
-    def display_previous_question(self):
+    def display_previous_question(self, label, textbox):
         self.current_question = ((self.current_question - 1) % self.questions_number)
-        self.KeyAuth_question_counter_label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
+        label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
         # Активировать ТекстБокс
-        self.KeyAuth_questions_textbox.configure(state="normal")         
+        textbox.configure(state="normal")         
         # Отчистка ТекстБокса
-        self.KeyAuth_questions_textbox.delete('1.0', CTk.END) 
+        textbox.delete('1.0', CTk.END) 
         # Вставка вопроса в ТекстБокс
-        self.KeyAuth_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
+        textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
         # Деактивировать ТекстБокс
-        self.KeyAuth_questions_textbox.configure(state="disabled")        
+        textbox.configure(state="disabled")        
 
 
     def login_event(self):
