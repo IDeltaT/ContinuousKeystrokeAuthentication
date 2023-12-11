@@ -186,43 +186,45 @@ class App(CTk.CTk):
         # Обеспечиваем доступ к фрейму из машины состояний
         self.state_machine.frames_setter('password_authorization_frame', self.password_authorization_frame)
 
-        # Отображение названия программы (Label)
+        # Label: Отображение названия программы
         self.program_name_label = CTk.CTkLabel(self.password_authorization_frame, 
                                                text=program_name, 
                                                font=CTk.CTkFont(size=20, weight='bold'))
-        self.program_name_label.grid(row=0, column=0, padx=30, pady=(60, 15))
+        self.program_name_label.grid(row=0, column=0, padx=30, pady=(40, 15))
         
-        # Лейбл: "Авторизация"
+        # Label: "Авторизация"
         self.authorization_label = CTk.CTkLabel(self.password_authorization_frame, 
                                                 text='АВТОРИЗАЦИЯ', 
                                                 font=CTk.CTkFont(size=20, weight='bold'))
-        self.authorization_label.grid(row=1, column=0, padx=30, pady=(40, 15))
+        self.authorization_label.grid(row=1, column=0, padx=30, pady=(40, 10))
   
-        # Поле для ввода логина
+        # Entry: Поле для ввода логина
         self.username_entry = CTk.CTkEntry(self.password_authorization_frame, 
                                            width=200, 
                                            placeholder_text='Имя пользователя')
-        self.username_entry.grid(row=2, column=0, padx=30, pady=(15, 15))
+        self.username_entry.grid(row=2, column=0, padx=30, pady=(10, 15))
         
-        # Поле для ввода пароля
+        # Entry: Поле для ввода пароля
         self.password_entry = CTk.CTkEntry(self.password_authorization_frame, 
                                            width=200, 
                                            show='*', 
                                            placeholder_text='Пароль')
         self.password_entry.grid(row=3, column=0, padx=30, pady=(0, 15))
         
-        # Кнопка: "Войти"
+        # Button: "Войти"
         self.login_button = CTk.CTkButton(self.password_authorization_frame, 
-                                          text='Войти', 
+                                          text='войти', 
                                           command=self.state_machine.switch_to_keystroke_authorization, 
-                                          width=200)
+                                          width=200,
+                                          font=CTk.CTkFont(size=14, weight='bold'))
         self.login_button.grid(row=4, column=0, padx=30, pady=(10, 10))
         
-        # Кнопка: "Регистрация"
+        # Button: "Регистрация"
         self.PassAuth_to_Reg_frame_button = CTk.CTkButton(self.password_authorization_frame, 
-                                                          text='Регистрация', 
+                                                          text='регистрация', 
                                                           command=self.state_machine.switch_to_registration,
-                                                          width=200)
+                                                          width=200,
+                                                          font=CTk.CTkFont(size=14, weight='bold'))
         self.PassAuth_to_Reg_frame_button.grid(row=5, column=0, padx=30, pady=(10, 10))
 
 
@@ -235,34 +237,39 @@ class App(CTk.CTk):
         # Обеспечиваем доступ к фрейму из машины состояний
         self.state_machine.frames_setter('registration_frame', self.registration_frame)
        
-        # Лейбл: "Регистрация"
-        self.registration_frame_name_label = CTk.CTkLabel(self.registration_frame, text='РЕГИСТРАЦИЯ', 
-                                               font=CTk.CTkFont(size=20, weight='bold'))
-        self.registration_frame_name_label.grid(row=0, column=0, padx=30, pady=(200, 15))
+        # Label: "Регистрация"
+        self.registration_frame_name_label = CTk.CTkLabel(self.registration_frame, 
+                                                          text='РЕГИСТРАЦИЯ\nНОВОГО\nПОЛЬЗОВАТЕЛЯ', 
+                                                          font=CTk.CTkFont(size=20, weight='bold'))
+        self.registration_frame_name_label.grid(row=0, column=0, padx=30, pady=(170, 15))
    
-        # Поле для ввода логина
-        self.registration_username_entry = CTk.CTkEntry(self.registration_frame, width=200, 
+        # Entry: Поле для ввода логина
+        self.registration_username_entry = CTk.CTkEntry(self.registration_frame, 
+                                                        width=200, 
                                                         placeholder_text='Имя пользователя')
         self.registration_username_entry.grid(row=1, column=0, padx=30, pady=(15, 15))
         
-        # Поле для ввода пароля
-        self.registration_password_entry = CTk.CTkEntry(self.registration_frame, width=200, 
+        # Entry: Поле для ввода пароля
+        self.registration_password_entry = CTk.CTkEntry(self.registration_frame, 
+                                                        width=200, 
                                                         placeholder_text='Пароль')
-        self.registration_password_entry.grid(row=2, column=0, padx=30, pady=(0, 15))
+        self.registration_password_entry.grid(row=2, column=0, padx=30, pady=(0, 10))
 
-        # Кнопка: "Зарегистрироваться"
+        # Button: "Зарегистрироваться"
         self.registration_button = CTk.CTkButton(self.registration_frame, 
-                                                 text='Зарегистрироваться', 
+                                                 text='зарегистрироваться', 
                                                  command=self.state_machine.switch_to_keystroke_extract, 
-                                                 width=200)
-        self.registration_button.grid(row=3, column=0, padx=30, pady=(10, 10))
+                                                 width=200,
+                                                 font=CTk.CTkFont(size=14, weight='bold'))
+        self.registration_button.grid(row=3, column=0, padx=30, pady=(5, 10))
         
         
-        # Кнопка: "Авторизация"
+        # Button: "Авторизация"
         self.Reg_to_PassAuth_frame_button = CTk.CTkButton(self.registration_frame, 
-                                                          text='Авторизация', 
+                                                          text='авторизация', 
                                                           command=self.state_machine.switch_to_password_authorization, 
-                                                          width=200)      
+                                                          width=200,
+                                                          font=CTk.CTkFont(size=14, weight='bold'))      
         self.Reg_to_PassAuth_frame_button.grid(row=4, column=0, padx=30, pady=(30, 10))
 
 
@@ -276,7 +283,7 @@ class App(CTk.CTk):
         self.state_machine.frames_setter('keystroke_authorization_frame', self.keystroke_authorization_frame)
         
         KeyAuth_frame_name_text = 'АУТЕНТИФИКАЦИЯ ПО КЛАВИАТУРНОМУ ПОЧЕРКУ'
-        # Лейбл: "Аутентификация по клавиатурному почерку"
+        # Label: "Аутентификация по клавиатурному почерку"
         self.keystroke_authorization_frame_name_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
                                                                      text=KeyAuth_frame_name_text, 
                                                                      font=CTk.CTkFont(size=20, weight='bold'))
@@ -285,24 +292,24 @@ class App(CTk.CTk):
         KeyAuth_frame_instruction_text = 'для успешного прохождения данного этапа аутентификации,\n\
 посторайтесь дать развернутые ответы на поставленные вопросы\n(при необходимости, можно заменить вопрос)\n\n\
 ВОПРОСЫ:'
-        # Лейбл: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
+        # Label: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
         self.KeyAuth_instruction_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
                                                       text=KeyAuth_frame_instruction_text, 
                                                       font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyAuth_instruction_label.grid(row=1, column=0, padx=30, pady=(10, 5))
 
-        # ТекстБокс: Содержит вопросы
+        # TextBox: Содержит вопросы
         self.KeyAuth_questions_textbox = CTk.CTkTextbox(self.keystroke_authorization_frame, 
                                                         width=500, 
                                                         height=100,
                                                         wrap=CTk.WORD,
                                                         font=CTk.CTkFont(size=16, weight='bold'))
         self.KeyAuth_questions_textbox.grid(row=2, column=0, padx=(20, 20), pady=(5, 0))
-        # Отчистка ТекстБокса
+        # Отчистка TextBox'а
         self.KeyAuth_questions_textbox.delete('1.0', CTk.END)
-        # Вставка вопроса в ТекстБокс
+        # Вставка вопроса в TextBox
         self.KeyAuth_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
-        self.KeyAuth_questions_textbox.configure(state="disabled") # Деактивировать ТекстБокс
+        self.KeyAuth_questions_textbox.configure(state="disabled") # Деактивировать TextBox
 
 
         # Создание фрейма, содержащего элементы управления перелистывания вопросов
@@ -311,7 +318,7 @@ class App(CTk.CTk):
                                                            fg_color='transparent')
         self.KeyAuth_question_control_frame.grid(row=3, column=0, padx=0, pady=(3, 10))
         
-        # Кнопка: "<" Предыдущий вопрос
+        # Button: "<" Предыдущий вопрос
         self.previous_question_button = CTk.CTkButton(self.KeyAuth_question_control_frame, 
                                                       text='<', 
                                                       command=lambda: self.display_previous_question(self.KeyAuth_question_counter_label,
@@ -320,13 +327,13 @@ class App(CTk.CTk):
                                                       font=CTk.CTkFont(size=20, weight='bold'))
         self.previous_question_button.grid(row=0, column=0, padx=5, pady=(3, 5))
         
-        # Лейбл: Текущий вопрос / Всего вопросов
+        # Label: Текущий вопрос / Всего вопросов
         self.KeyAuth_question_counter_label = CTk.CTkLabel(self.KeyAuth_question_control_frame, 
                                                            text=f'{self.current_question + 1}/{self.questions_number}', 
                                                            font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyAuth_question_counter_label.grid(row=0, column=1, padx=5, pady=(3, 5))        
         
-        # Кнопка: ">" Следующий вопрос
+        # Button: ">" Следующий вопрос
         self.next_question_button = CTk.CTkButton(self.KeyAuth_question_control_frame, 
                                                   text='>', 
                                                   command=lambda: self.display_next_question(self.KeyAuth_question_counter_label,
@@ -335,27 +342,27 @@ class App(CTk.CTk):
                                                   font=CTk.CTkFont(size=20, weight='bold'))
         self.next_question_button.grid(row=0, column=2, padx=5, pady=(3, 5))
 
-        # Лейбл: Ответы
+        # Label: Ответы
         self.KeyAuth_answers_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
                                                   text='ПОЛЕ, ДЛЯ ВВОДА ОТВЕТОВ:', 
                                                   font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyAuth_answers_label.grid(row=4, column=0, padx=30, pady=(5, 5))
 
-        # ТекстБокс: Предназначен для ввода ответов
+        # TextBox: Предназначен для ввода ответов
         self.KeyAuth_answers_textbox = CTk.CTkTextbox(self.keystroke_authorization_frame, 
                                                       width=500, 
                                                       height=100,
                                                       wrap=CTk.WORD,
                                                       font=CTk.CTkFont(size=16, weight='bold'))
         self.KeyAuth_answers_textbox.grid(row=5, column=0, padx=(20, 20), pady=(5, 0))      
-        self.KeyAuth_answers_textbox.delete('1.0', CTk.END) # Отчистка ТекстБокса
+        self.KeyAuth_answers_textbox.delete('1.0', CTk.END) # Отчистка TextBox'а
         
         self.KeyAuth_answers_textbox.bind('<KeyPress>', self.press_key_event_KeyAuthFrame)
 
-        # CTk 5.2.1 - Фокус на ТекстБоксе все еще не работает
-        self.KeyAuth_answers_textbox.focus() # Фокус на ТекстБоксе
-        #self.KeyAuth_answers_textbox.focus_set() # Альтернативный Фокус на ТекстБоксе
-        #self.KeyAuth_answers_textbox.focus_force() # Альтернативный Фокус на ТекстБоксе
+        # CTk 5.2.1 - Фокус на TextBox'е все еще не работает
+        self.KeyAuth_answers_textbox.focus() # Фокус на TextBox'е
+        #self.KeyAuth_answers_textbox.focus_set() # Альтернативный Фокус на TextBox'е
+        #self.KeyAuth_answers_textbox.focus_force() # Альтернативный Фокус на TextBox'е
        
         self.KeyAuth_progressbar = CTk.CTkProgressBar(self.keystroke_authorization_frame)
         self.KeyAuth_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
@@ -364,11 +371,12 @@ class App(CTk.CTk):
         self.KeyAuth_progressbar.set(0)
         #self.KeyAuth_progressbar.start()
         
-        # Кнопка: "Вернутся"
+        # Button: "Вернутся"
         self.KeyAuth_to_PassAuth_frame_button = CTk.CTkButton(self.keystroke_authorization_frame, 
-                                                              text='Вернуться', 
+                                                              text='вернуться', 
                                                               command=self.state_machine.switch_to_password_authorization, 
-                                                              width=200)
+                                                              width=200,
+                                                              font=CTk.CTkFont(size=14, weight='bold'))
         self.KeyAuth_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(20, 10))
         
 
@@ -382,7 +390,7 @@ class App(CTk.CTk):
         self.state_machine.frames_setter('keystroke_extract_frame', self.keystroke_extract_frame)
         
         KeyExtr_frame_name_text = 'ЭКСТРАКТОР ПРИЗНАКОВ'
-        # Лейбл: "Экстрактор признаков"
+        # Label: "Экстрактор признаков"
         self.KeyExtr_frame_name_label = CTk.CTkLabel(self.keystroke_extract_frame, 
                                                      text=KeyExtr_frame_name_text, 
                                                      font=CTk.CTkFont(size=20, weight='bold'))
@@ -391,24 +399,24 @@ class App(CTk.CTk):
         KeyExtr_frame_instruction_text = 'для успешного обучения искусственной нейронной сети\n\
 определять вас как "Своего" и блокировать доступ\n"Чужому", вам следует отвечать на заданные вопросы,\n\
 пока не заполнится шкала (вопросы можно менять)\n\nВОПРОСЫ:'
-        # Лейбл: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
+        # Label: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
         self.KeyExtr_frame_instruction_label = CTk.CTkLabel(self.keystroke_extract_frame, 
                                                             text=KeyExtr_frame_instruction_text, 
                                                             font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyExtr_frame_instruction_label.grid(row=1, column=0, padx=30, pady=(10, 5))
         
-        # ТекстБокс: Содержит вопросы
+        # TextBox: Содержит вопросы
         self.KeyExtr_questions_textbox = CTk.CTkTextbox(self.keystroke_extract_frame, 
                                                         width=500, 
                                                         height=100,
                                                         wrap=CTk.WORD,
                                                         font=CTk.CTkFont(size=16, weight='bold'))
         self.KeyExtr_questions_textbox.grid(row=2, column=0, padx=(20, 20), pady=(5, 0))
-        # Отчистка ТекстБокса
+        # Отчистка TextBox'а
         self.KeyExtr_questions_textbox.delete('1.0', CTk.END)
-        # Вставка вопроса в ТекстБокс
+        # Вставка вопроса в TextBox
         self.KeyExtr_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
-        self.KeyExtr_questions_textbox.configure(state="disabled") # Деактивировать ТекстБокс       
+        self.KeyExtr_questions_textbox.configure(state="disabled") # Деактивировать TextBox       
         
 
         # Создание фрейма, содержащего элементы управления перелистывания вопросов
@@ -417,7 +425,7 @@ class App(CTk.CTk):
                                                            fg_color='transparent')
         self.KeyExtr_question_control_frame.grid(row=3, column=0, padx=0, pady=(3, 10))
         
-        # Кнопка: "<" Предыдущий вопрос
+        # Button: "<" Предыдущий вопрос
         self.previous_question_button = CTk.CTkButton(self.KeyExtr_question_control_frame, 
                                                       text='<', 
                                                       command=lambda: self.display_previous_question(self.KeyExtr_question_counter_label, 
@@ -426,13 +434,13 @@ class App(CTk.CTk):
                                                       font=CTk.CTkFont(size=20, weight='bold'))
         self.previous_question_button.grid(row=0, column=0, padx=5, pady=(3, 5))
         
-        # Лейбл: Текущий вопрос / Всего вопросов
+        # Label: Текущий вопрос / Всего вопросов
         self.KeyExtr_question_counter_label = CTk.CTkLabel(self.KeyExtr_question_control_frame, 
                                                            text=f'{self.current_question + 1}/{self.questions_number}', 
                                                            font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyExtr_question_counter_label.grid(row=0, column=1, padx=5, pady=(3, 5))        
         
-        # Кнопка: ">" Следующий вопрос
+        # Button: ">" Следующий вопрос
         self.next_question_button = CTk.CTkButton(self.KeyExtr_question_control_frame, 
                                                   text='>', 
                                                   command=lambda: self.display_next_question(self.KeyExtr_question_counter_label, 
@@ -441,27 +449,27 @@ class App(CTk.CTk):
                                                   font=CTk.CTkFont(size=20, weight='bold'))
         self.next_question_button.grid(row=0, column=2, padx=5, pady=(3, 5))
 
-        # Лейбл: Ответы
+        # Label: Ответы
         self.KeyExtr_answers_label = CTk.CTkLabel(self.keystroke_extract_frame, 
                                                   text='ПОЛЕ, ДЛЯ ВВОДА ОТВЕТОВ:', 
                                                   font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyExtr_answers_label.grid(row=4, column=0, padx=30, pady=(5, 5))
 
-        # ТекстБокс: Предназначен для ввода ответов
+        # TextBox: Предназначен для ввода ответов
         self.KeyExtr_answers_textbox = CTk.CTkTextbox(self.keystroke_extract_frame, 
                                                       width=500, 
                                                       height=100,
                                                       wrap=CTk.WORD,
                                                       font=CTk.CTkFont(size=16, weight='bold'))
         self.KeyExtr_answers_textbox.grid(row=5, column=0, padx=(20, 20), pady=(5, 0))      
-        self.KeyExtr_answers_textbox.delete('1.0', CTk.END) # Отчистка ТекстБокса
+        self.KeyExtr_answers_textbox.delete('1.0', CTk.END) # Отчистка TextBox'а
         
         self.KeyExtr_answers_textbox.bind('<KeyPress>', self.press_key_event_KeyExtrFrame)
 
-        # CTk 5.2.1 - Фокус на ТекстБоксе все еще не работает
-        self.KeyExtr_answers_textbox.focus() # Фокус на ТекстБоксе
-        #self.KeyExtr_answers_textbox.focus_set() # Альтернативный Фокус на ТекстБоксе
-        #self.KeyExtr_answers_textbox.focus_force() # Альтернативный Фокус на ТекстБоксе
+        # CTk 5.2.1 - Фокус на TextBox'е все еще не работает
+        self.KeyExtr_answers_textbox.focus() # Фокус на TextBox'е
+        #self.KeyExtr_answers_textbox.focus_set() # Альтернативный Фокус на TextBox'е
+        #self.KeyExtr_answers_textbox.focus_force() # Альтернативный Фокус на TextBox'е
 
         self.KeyExtr_progressbar = CTk.CTkProgressBar(self.keystroke_extract_frame)
         self.KeyExtr_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
@@ -469,11 +477,12 @@ class App(CTk.CTk):
         self.KeyExtr_progressbar.configure(mode="determinate")
         self.KeyExtr_progressbar.set(0)
         
-        # Кнопка: "Вернутся"
+        # Button: "Вернутся"
         self.KeyExtr_to_PassAuth_frame_button = CTk.CTkButton(self.keystroke_extract_frame, 
-                                                              text='Вернуться', 
+                                                              text='вернуться', 
                                                               command=self.state_machine.switch_to_password_authorization, 
-                                                              width=200)
+                                                              width=200,
+                                                              font=CTk.CTkFont(size=14, weight='bold'))
         self.KeyExtr_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(20, 10))
         
 
@@ -492,41 +501,42 @@ class App(CTk.CTk):
         self.settings_frame.grid(row=0, column=0, sticky='ns')
  
 
-        # Лейбл: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+        # Label: ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
         self.settings_frame_profile_label = CTk.CTkLabel(self.settings_frame, 
                                                          text='ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ', 
                                                          font=CTk.CTkFont(size=20, weight='bold'))
         self.settings_frame_profile_label.grid(row=0, column=0, padx=30, pady=(15, 15))
-
 
         # Создание подфрейма, содержащего имя текущего пользовтеля
         self.settings_current_user_frame = CTk.CTkFrame(self.settings_frame, 
                                                         corner_radius=0)
         self.settings_current_user_frame.grid(row=1, column=0, sticky='nswe')
         
+        # Картинка (абстрактное обозначение пользователя)
         self.user_image = CTk.CTkImage(Image.open('images/UserImage.png'), size=(48, 48))
         
+        # Label: Отображение картинки
         self.settings_frame_current_user_image = CTk.CTkLabel(self.settings_current_user_frame, 
                                                               text='', 
                                                               image=self.user_image,
                                                               font=CTk.CTkFont(size=18, weight='bold'))
         self.settings_frame_current_user_image.grid(row=0, column=0, padx=(30,5), pady=(5, 5), sticky='nsw')
         
-
+        # Label: Отображение имени текущего пользователя
         self.settings_frame_current_user_label = CTk.CTkLabel(self.settings_current_user_frame, 
                                                               text=f'{self.current_user}', 
                                                               font=CTk.CTkFont(size=18, weight='bold'))
         self.settings_frame_current_user_label.grid(row=0, column=1, padx=5, pady=(5, 5), sticky='nsw')
 
 
-        # Лейбл: настройки
+        # Label: настройки
         self.settings_frame_settings_label = CTk.CTkLabel(self.settings_frame, 
                                                           text='НАСТРОЙКИ:', 
                                                           font=CTk.CTkFont(size=18, weight='bold'))
         self.settings_frame_settings_label.grid(row=2, column=0, padx=0, pady=(25, 5))
 
 
-        # Кнопка: "Сбросить модель"
+        # Button: "сбросить модель"
         self.settings_frame_reset_model_button = CTk.CTkButton(self.settings_frame, 
                                                                text='сбросить модель', 
                                                                command=self.login_event, 
@@ -535,7 +545,7 @@ class App(CTk.CTk):
         self.settings_frame_reset_model_button.grid(row=3, column=0, padx=0, pady=(10, 10))
         
 
-        # Кнопка: "Изменить пароль"
+        # Button: "Изменить пароль"
         self.settings_frame_change_password_button = CTk.CTkButton(self.settings_frame, 
                                                                    text='изменить пароль', 
                                                                    command=self.login_event, 
@@ -544,14 +554,14 @@ class App(CTk.CTk):
         self.settings_frame_change_password_button.grid(row=4, column=0, padx=0, pady=(10, 10))
         
 
-        # Лейбл: допустимое отклонение
+        # Label: "допустимое отклонение"
         self.settings_frame_tolerance_label = CTk.CTkLabel(self.settings_frame, 
                                                           text='допустимое отклонение:', 
                                                           font=CTk.CTkFont(size=14, weight='bold'))
         self.settings_frame_tolerance_label.grid(row=5, column=0, padx=0, pady=(5, 0))
         
         
-        # Опциональное меню: Допустимое отклонение (стандартное/увеличенное)
+        # OptionMenu: Допустимое отклонение (стандартное/увеличенное)
         self.settings_frame_tolerance_mode = CTk.CTkOptionMenu(self.settings_frame, 
                                                                dynamic_resizing=False,
                                                                values=['стандартное', 'увеличенное'],
@@ -564,7 +574,7 @@ class App(CTk.CTk):
         self.actions_frame = CTk.CTkFrame(self.settings_frame, corner_radius=10)
         self.actions_frame.grid(row=7, column=0, pady=(8, 0))
 
-        # Лейбл: действия при обнаружении "Чужого"
+        # Label: действия при обнаружении "Чужого"
         self.settings_frame_tolerance_label = CTk.CTkLabel(self.actions_frame, 
                                                           text='действия при\nобнаружении "Чужого":', 
                                                           font=CTk.CTkFont(size=14, weight='bold'))
@@ -592,7 +602,7 @@ class App(CTk.CTk):
         self.settings_frame_ContAuth_Switch.grid(row=8, column=0, pady=(15, 10))
 
 
-        # Кнопка: "Выйти"
+        # Button: "выйти"
         self.settings_frame_logout_button = CTk.CTkButton(self.settings_frame, 
                                                                    text='выйти', 
                                                                    command=self.login_event, 
