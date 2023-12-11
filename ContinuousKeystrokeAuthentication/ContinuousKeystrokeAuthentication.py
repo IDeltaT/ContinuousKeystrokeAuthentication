@@ -71,14 +71,14 @@ class StateMachine:
     
 
     def display_password_authorization(self):
-        print("display_password_authorization")
+        print('display_password_authorization')
         self.forget_all_frames()
         
         self.frames['password_authorization_frame'].grid(row=0, column=0, sticky='ns')
 
 
     def display_registration(self):
-        print("display_registration")
+        print('display_registration')
         
         self.forget_all_frames()
         
@@ -86,7 +86,7 @@ class StateMachine:
             
 
     def display_keystroke_authorization(self):
-        print("display_keystroke_authorization")      
+        print('display_keystroke_authorization')      
         self.characters_counter = 0 # Сбросить кол-во введенных символов
         
         self.forget_all_frames()        
@@ -95,7 +95,7 @@ class StateMachine:
 
         
     def display_keystroke_extract(self):
-        print("display_keystroke_extract")
+        print('display_keystroke_extract')
         self.characters_counter = 0 # Сбросить кол-во введенных символов
         
         self.forget_all_frames()
@@ -104,7 +104,7 @@ class StateMachine:
 
 
     def display_user_profile(self):
-        print("display_user_profile")  
+        print('display_user_profile')  
         
         self.forget_all_frames()
 
@@ -118,8 +118,8 @@ class App(CTk.CTk):
     WIDTH = 900
     HEIGHT = 600
     
-    CTk.set_appearance_mode("dark")         # Тема приложения по умолчанию: Темная
-    CTk.set_default_color_theme("green")    # Цветовая тема приложения по умолчанию: Зеленая
+    CTk.set_appearance_mode('dark')         # Тема приложения по умолчанию: Темная
+    CTk.set_default_color_theme('green')    # Цветовая тема приложения по умолчанию: Зеленая
     
 
 
@@ -309,7 +309,7 @@ class App(CTk.CTk):
         self.KeyAuth_questions_textbox.delete('1.0', CTk.END)
         # Вставка вопроса в TextBox
         self.KeyAuth_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
-        self.KeyAuth_questions_textbox.configure(state="disabled") # Деактивировать TextBox
+        self.KeyAuth_questions_textbox.configure(state='disabled') # Деактивировать TextBox
 
 
         # Создание фрейма, содержащего элементы управления перелистывания вопросов
@@ -366,8 +366,8 @@ class App(CTk.CTk):
        
         self.KeyAuth_progressbar = CTk.CTkProgressBar(self.keystroke_authorization_frame)
         self.KeyAuth_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
-        #self.KeyAuth_progressbar.configure(mode="indeterminnate")
-        self.KeyAuth_progressbar.configure(mode="determinate")
+        #self.KeyAuth_progressbar.configure(mode='indeterminnate')
+        self.KeyAuth_progressbar.configure(mode='determinate')
         self.KeyAuth_progressbar.set(0)
         #self.KeyAuth_progressbar.start()
         
@@ -416,7 +416,7 @@ class App(CTk.CTk):
         self.KeyExtr_questions_textbox.delete('1.0', CTk.END)
         # Вставка вопроса в TextBox
         self.KeyExtr_questions_textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
-        self.KeyExtr_questions_textbox.configure(state="disabled") # Деактивировать TextBox       
+        self.KeyExtr_questions_textbox.configure(state='disabled') # Деактивировать TextBox       
         
 
         # Создание фрейма, содержащего элементы управления перелистывания вопросов
@@ -473,8 +473,8 @@ class App(CTk.CTk):
 
         self.KeyExtr_progressbar = CTk.CTkProgressBar(self.keystroke_extract_frame)
         self.KeyExtr_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
-        #self.KeyAuth_progressbar.configure(mode="indeterminnate")
-        self.KeyExtr_progressbar.configure(mode="determinate")
+        #self.KeyAuth_progressbar.configure(mode='indeterminnate')
+        self.KeyExtr_progressbar.configure(mode='determinate')
         self.KeyExtr_progressbar.set(0)
         
         # Button: "Вернутся"
@@ -648,13 +648,13 @@ class App(CTk.CTk):
         label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
         # Активировать ТекстБокс
-        textbox.configure(state="normal") 
+        textbox.configure(state='normal') 
         # Отчистка ТекстБокса
         textbox.delete('1.0', CTk.END) 
         # Вставка вопроса в ТекстБокс
         textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
         # Деактивировать ТекстБокс
-        textbox.configure(state="disabled") 
+        textbox.configure(state='disabled') 
 
 
     def display_previous_question(self, label, textbox):
@@ -662,13 +662,13 @@ class App(CTk.CTk):
         label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
         # Активировать ТекстБокс
-        textbox.configure(state="normal")         
+        textbox.configure(state='normal')         
         # Отчистка ТекстБокса
         textbox.delete('1.0', CTk.END) 
         # Вставка вопроса в ТекстБокс
         textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
         # Деактивировать ТекстБокс
-        textbox.configure(state="disabled")        
+        textbox.configure(state='disabled')        
 
 
     def login_event(self):
