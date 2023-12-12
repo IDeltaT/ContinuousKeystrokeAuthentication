@@ -75,13 +75,15 @@ class StateMachine:
     def display_password_authorization(self):
         print('display_password_authorization')
         self.forget_all_frames()
-
+        self.app.focus() # Убрать фокус с TextBox'а и остальных полей
+        
         self.frames['password_authorization_frame'].grid(row=0, column=0, sticky='ns')
 
 
     def display_registration(self):
         print('display_registration')
         self.forget_all_frames()
+        self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         
         self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
             
@@ -90,6 +92,7 @@ class StateMachine:
         print('display_keystroke_authorization')      
         self.app.characters_counter = 0 # Сбросить кол-во введенных символов
         self.app.current_question = 0
+        self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         
         self.forget_all_frames()        
 
@@ -100,6 +103,7 @@ class StateMachine:
         print('display_keystroke_extract')
         self.app.characters_counter = 0 # Сбросить кол-во введенных символов
         self.app.current_question = 0
+        self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         
         self.forget_all_frames()
         
@@ -108,7 +112,7 @@ class StateMachine:
 
     def display_user_profile(self):
         print('display_user_profile')  
-        
+        self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         self.forget_all_frames()
 
         self.frames['user_profile_frame'].grid(row=0, column=0, sticky='ns')
@@ -161,8 +165,9 @@ class App(CTk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         
-        self.current_user = 'IKSuser'
-
+        #self.current_user = 'IKSuser'
+        self.current_user = 'Anonim'
+        
         self.alert_CheckBox_BooleanVar = CTk.BooleanVar()
         self.alert_CheckBox_BooleanVar.set(True)
         
@@ -172,7 +177,20 @@ class App(CTk.CTk):
         self.ContAuth_Switch_BooleanVar = CTk.BooleanVar()
         self.ContAuth_Switch_BooleanVar.set(True)
         
-        
+        # Примерный вид логов
+        self.logs = ['- 02.12.2023 15:27:41 Неверный ввод пароля;',
+                     '- 02.12.2023 15:29:16 Успешная авторизация в системе;',
+                     '- 02.12.2023 15:48:22 Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик);',
+                     '- 02.12.2023 15:48:22 Выведено системное предупреждение;',
+                     '- 02.12.2023 15:48:22 Компьютер заблокирован;',
+                     '- 02.12.2023 15:51:16 Успешная авторизация в системе;',
+                     '- 03.12.2023 13:11:52 Успешная авторизация в системе;',
+                     '- 03.12.2023 13:15:52 Успешно внесены изменения в настройки программы;',
+                     '- 03.12.2023 13:17:30 Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик);',
+                     '- 03.12.2023 13:17:30 Выведено системное предупреждение;',
+                     '- 03.12.2023 14:02:16 Успешная авторизация в системе;',]        
+
+
         # --------------------------------- password authorization frame ---------------------------------- #
         # Загрузка и установка заднего фона
         self.bg_image = CTk.CTkImage(Image.open('images/bg_gradient.jpg'), size=(self.WIDTH, self.HEIGHT))
@@ -367,8 +385,9 @@ class App(CTk.CTk):
         #self.KeyAuth_answers_textbox.focus_set() # Альтернативный Фокус на TextBox'е
         #self.KeyAuth_answers_textbox.focus_force() # Альтернативный Фокус на TextBox'е
        
+        # ProgressBar: Отоброжает сотояние процесса аутентификации
         self.KeyAuth_progressbar = CTk.CTkProgressBar(self.keystroke_authorization_frame)
-        self.KeyAuth_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
+        self.KeyAuth_progressbar.grid(row=6, column=0, padx=30, pady=(10, 5))
         #self.KeyAuth_progressbar.configure(mode='indeterminnate')
         self.KeyAuth_progressbar.configure(mode='determinate')
         self.KeyAuth_progressbar.set(0)
@@ -474,8 +493,9 @@ class App(CTk.CTk):
         #self.KeyExtr_answers_textbox.focus_set() # Альтернативный Фокус на TextBox'е
         #self.KeyExtr_answers_textbox.focus_force() # Альтернативный Фокус на TextBox'е
 
+        # ProgressBar: Отоброжает сотояние процесса сбора биометрического образа
         self.KeyExtr_progressbar = CTk.CTkProgressBar(self.keystroke_extract_frame)
-        self.KeyExtr_progressbar.grid(row=6, column=0, padx=30, pady=(5, 5))
+        self.KeyExtr_progressbar.grid(row=6, column=0, padx=30, pady=(10, 5))
         #self.KeyAuth_progressbar.configure(mode='indeterminnate')
         self.KeyExtr_progressbar.configure(mode='determinate')
         self.KeyExtr_progressbar.set(0)
@@ -511,9 +531,8 @@ class App(CTk.CTk):
         self.settings_frame_profile_label.grid(row=0, column=0, padx=30, pady=(15, 15))
 
         # Создание подфрейма, содержащего имя текущего пользовтеля
-        self.settings_current_user_frame = CTk.CTkFrame(self.settings_frame, 
-                                                        corner_radius=0)
-        self.settings_current_user_frame.grid(row=1, column=0, sticky='nswe')
+        self.settings_current_user_frame = CTk.CTkFrame(self.settings_frame, corner_radius=60)
+        self.settings_current_user_frame.grid(row=1, column=0, sticky='nswe',)
         
         # Картинка (абстрактное обозначение пользователя)
         self.user_image = CTk.CTkImage(Image.open('images/UserImage.png'), size=(48, 48))
@@ -523,13 +542,13 @@ class App(CTk.CTk):
                                                               text='', 
                                                               image=self.user_image,
                                                               font=CTk.CTkFont(size=18, weight='bold'))
-        self.settings_frame_current_user_image.grid(row=0, column=0, padx=(30,5), pady=(5, 5), sticky='nsw')
+        self.settings_frame_current_user_image.grid(row=0, column=0, padx=(29,5), pady=(5, 5), sticky='e')
         
         # Label: Отображение имени текущего пользователя
         self.settings_frame_current_user_label = CTk.CTkLabel(self.settings_current_user_frame, 
                                                               text=f'{self.current_user}', 
                                                               font=CTk.CTkFont(size=18, weight='bold'))
-        self.settings_frame_current_user_label.grid(row=0, column=1, padx=5, pady=(5, 5), sticky='nsw')
+        self.settings_frame_current_user_label.grid(row=0, column=1, padx=5, pady=(5, 5), sticky='e')
 
 
         # Label: настройки
@@ -608,7 +627,7 @@ class App(CTk.CTk):
         # Button: "выйти"
         self.settings_frame_logout_button = CTk.CTkButton(self.settings_frame, 
                                                                    text='выйти', 
-                                                                   command=self.login_event, 
+                                                                   command=self.state_machine.switch_to_password_authorization, 
                                                                    width=200,
                                                                    font=CTk.CTkFont(size=14, weight='bold'))
         self.settings_frame_logout_button.grid(row=9, column=0, padx=0, pady=(10, 10))
@@ -618,7 +637,26 @@ class App(CTk.CTk):
         self.logs_frame = CTk.CTkFrame(self.user_profile_frame, corner_radius=0, fg_color='transparent')
         self.logs_frame.grid(row=0, column=1, sticky='ns')
         
+        # Label: "ЖУРНАЛ СОБЫТИЙ"
+        self.logs_frame_event_log_label = CTk.CTkLabel(self.logs_frame, 
+                                                       text='ЖУРНАЛ СОБЫТИЙ', 
+                                                       font=CTk.CTkFont(size=20, weight='bold'))
+        self.logs_frame_event_log_label.grid(row=0, column=0, padx=30, pady=(15, 10)) # pady=(73, 10)
         
+
+        # TextBox: Содержит журнал событий # height=475
+        self.logs_frame_event_log_textbox = CTk.CTkTextbox(self.logs_frame, 
+                                                           width=360, 
+                                                           height=530,
+                                                           wrap=CTk.WORD,
+                                                           font=CTk.CTkFont(size=13, weight='bold'))
+        self.logs_frame_event_log_textbox.grid(row=1, column=0, padx=(20, 20), pady=(5, 0))
+        
+        self.logs_frame_event_log_textbox.delete('1.0', CTk.END) 
+        
+        
+        for log in reversed(self.logs):
+            self.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
         #####################################################################################################
 
 
