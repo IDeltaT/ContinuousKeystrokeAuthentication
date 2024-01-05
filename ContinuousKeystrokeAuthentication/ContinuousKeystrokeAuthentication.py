@@ -2,11 +2,15 @@
 from PIL import Image
 import customtkinter as CTk
 from transitions import Machine
+from tkinter.messagebox import showerror, showwarning, showinfo
 
-    
+import os
+
+import sqlite3
+from passlib.hash import argon2    
+
 
 class StateMachine:
-    
 
     # Возможные состояния программы:
     # 1. password_authorization - Базовая авторизация (Ввод: имя пользователя/пароль);
@@ -86,7 +90,7 @@ class StateMachine:
         self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         
         self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
-            
+        #showwarning(title='Предупреждение', message='Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')    
 
     def display_keystroke_authorization(self):
         print('display_keystroke_authorization')      
@@ -140,6 +144,11 @@ class App(CTk.CTk):
                                states = StateMachine.states, 
                                transitions = StateMachine.transitions, 
                                initial = 'password_authorization')
+        
+        # Путь к базе данных, содержащих данные для парольной аторизации пользователей
+        self.user_DB_path = 'UserData/Users.db'
+        self.init_user_DB()        
+        self.con = sqlite3.connect(self.user_DB_path)
 
         # Вопросы, для прохождения биометрической аутентификации по клавиатурному почерку
         self.questions = {1: 'Чем вы любите заниматься в свободное время?',
@@ -154,7 +163,7 @@ class App(CTk.CTk):
         self.questions_number = len(self.questions)
 
         self.characters_counter = 0      
-        self.authentication_required_characters = 20
+        self.authentication_required_characters = 40
         self.registration_required_characters = 200
 
         self.title('Программное средство аутентификации пользователя на основе клавиатурного почерка')
@@ -710,6 +719,17 @@ class App(CTk.CTk):
         textbox.insert('0.0', f'{self.questions[self.current_question + 1]}')
         # Деактивировать TextBox
         textbox.configure(state='disabled')        
+
+
+    def init_user_DB(self):
+        # Если файл БД не существует, создать новый, вывести предупреждение  
+        
+        is_exist = os.path.exists(self.user_DB_path)
+        if not is_exist:
+            # 'UserData/Users.db'
+            os.makedirs(self.user_DB_path.split('/')[0])
+            print('User DB not exists!')
+            showinfo(title='Предупреждение', message='База данных пользователей не обнаружена (Создана новая база данных).')
 
 
     def login_event(self):
