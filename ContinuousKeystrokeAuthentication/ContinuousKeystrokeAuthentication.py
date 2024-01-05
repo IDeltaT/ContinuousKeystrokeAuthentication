@@ -187,7 +187,8 @@ class App(CTk.CTk):
         self.grid_columnconfigure(1, weight=1)
         
         #self.current_user = 'IKSuser'
-        self.current_user = 'Anonim'
+        #self.current_user = 'Anonim'
+        self.current_user = None
         
         self.alert_CheckBox_BooleanVar = CTk.BooleanVar()
         self.alert_CheckBox_BooleanVar.set(True)
@@ -256,7 +257,7 @@ class App(CTk.CTk):
         # Button: "Войти"
         self.login_button = CTk.CTkButton(self.password_authorization_frame, 
                                           text='войти', 
-                                          command=self.state_machine.switch_to_keystroke_authorization, 
+                                          command=self.sign_in, 
                                           width=200,
                                           font=CTk.CTkFont(size=14, weight='bold'))
         self.login_button.grid(row=4, column=0, padx=30, pady=(10, 10))
@@ -778,6 +779,10 @@ class App(CTk.CTk):
                             cur.execute(f'insert into {self.user_table_name} values (?, ?)', (username, hashed_password))                                
                             self.con.commit()
                             
+                            # Изменение имени пользователя в профиле пользователя
+                            self.current_user = username                           
+                            self.settings_frame_current_user_label.configure(text = self.current_user)
+                            
                             showinfo(title='', message='Регистрация прошла успешно!')
                             
                             # Переход в окно экстрактора признаков
@@ -787,20 +792,7 @@ class App(CTk.CTk):
                 else:
                     showwarning(title='Предупреждение', message='Пользователь с таким именем уже существует!')
         else:
-            showwarning(title='Предупреждение', message='Заполните имя пользователя!')
-
-        
-    def check_username_db(self, name: str):
-
-        with self.con:
-            cur = self.con.cursor()
-            cur.execute(f'SELECT * FROM {self.user_table_name} WHERE login = ?', (name,))
-
-            user_data = cur.fetchone()
-        
-        print(f'user_data: {user_data}')
-
-        return user_data   
+            showwarning(title='Предупреждение', message='Заполните имя пользователя!')         
 
 
     def password_check(self, password: str) -> bool:
@@ -838,7 +830,58 @@ class App(CTk.CTk):
      
         return is_valid
     
+    
+    def sign_in(self):
+    
+        username = self.username_entry.get()
+        
+        password = self.password_entry.get()
+        
 
+        if username:
+            if ' ' in username:
+                showwarning(title='Предупреждение', message='Недопустимое имя пользователя!')
+            else:
+                user_data = self.check_username_db(username)
+        
+                if user_data is None:
+                    showwarning(title='', message='Имя пользователя или пароль введены неверно!')
+                else:
+                    if password:
+                        
+                        valid_hash = user_data[1]
+                        
+                        check_pass = argon2.verify(password, valid_hash)
+                        
+                        if check_pass:    
+                            
+                            # Изменение имени пользователя в профиле пользователя
+                            self.current_user = username
+                            self.settings_frame_current_user_label.configure(text = self.current_user)
+                            
+                            # Переход в окно аутентификации по клавиатурному почерку
+                            self.state_machine.switch_to_keystroke_authorization()
+                        else:
+                            showwarning(title='', message='Имя пользователя или пароль введены неверно!')
+                    else:
+                        showwarning(title='', message='Введите пароль!')
+        else:
+            showwarning(title='', message='Введите имя пользователя!')
+
+
+
+    def check_username_db(self, name: str):
+
+        with self.con:
+            cur = self.con.cursor()
+            cur.execute(f'SELECT * FROM {self.user_table_name} WHERE login = ?', (name,))
+
+            user_data = cur.fetchone()
+        
+        #print(f'user_data: {user_data}')
+
+        return user_data
+    
 
     def login_event(self):
         # "Заглушка"
