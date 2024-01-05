@@ -147,9 +147,21 @@ class App(CTk.CTk):
         
         # Путь к базе данных, содержащих данные для парольной аторизации пользователей
         self.user_DB_path = 'UserData/Users.db'
+        self.user_table_name = 'users'
         self.init_user_DB()        
         self.con = sqlite3.connect(self.user_DB_path)
 
+        self.argon2_rounds = 10
+
+        # -------------------- Политика паролей ---------------------- #      
+        self.min_password_length = 4
+        self.max_password_length = 25
+        self.digit_in_password = True
+        self.uppercase_letter_in_password = False
+        self.lowercase_letter_in_password = True
+        self.special_symbol_in_password = False
+        self.special_symbols = ['@', '#', '%', '&', '$']
+        
         # Вопросы, для прохождения биометрической аутентификации по клавиатурному почерку
         self.questions = {1: 'Чем вы любите заниматься в свободное время?',
                           2: 'Что вам больше нравится: искусство, музыка, спорт или театр? И почему?',
@@ -288,7 +300,7 @@ class App(CTk.CTk):
         # Button: "Зарегистрироваться"
         self.registration_button = CTk.CTkButton(self.registration_frame, 
                                                  text='зарегистрироваться', 
-                                                 command=self.state_machine.switch_to_keystroke_extract, 
+                                                 command=self.registration_new_user, 
                                                  width=200,
                                                  font=CTk.CTkFont(size=14, weight='bold'))
         self.registration_button.grid(row=3, column=0, padx=30, pady=(5, 10))
@@ -728,8 +740,104 @@ class App(CTk.CTk):
         if not is_exist:
             # 'UserData/Users.db'
             os.makedirs(self.user_DB_path.split('/')[0])
-            print('User DB not exists!')
             showinfo(title='Предупреждение', message='База данных пользователей не обнаружена (Создана новая база данных).')
+            
+            con = sqlite3.connect(self.user_DB_path)
+            
+            sql_create_users_table = f'''CREATE TABLE IF NOT EXISTS {self.user_table_name} 
+                                         (
+                                             login text PRIMARY KEY,                                                                             
+                                             hashed_password text NOT NULL
+                                         );'''
+            
+            with con:
+                cur = con.cursor()
+                cur.execute(sql_create_users_table)
+
+
+    def registration_new_user(self):
+        
+        username = self.registration_username_entry.get()
+        
+        password = self.registration_password_entry.get()
+        
+        #print(f'username: {username} | password: {password}')
+        
+        if username:
+            if ' ' in username:
+                showwarning(title='Предупреждение', message='Недопустимо использовать пробелы в имени пользователя!')
+            else:
+                user_data = self.check_username_db(username)
+        
+                if user_data is None:     
+                    if self.password_check(password):
+                        with self.con:
+                            # Хеширование пароля и добавление нового пользователя в БД
+                            cur = self.con.cursor()  
+                            hashed_password = argon2.using(rounds = self.argon2_rounds).hash(password)
+                            cur.execute(f'insert into {self.user_table_name} values (?, ?)', (username, hashed_password))                                
+                            self.con.commit()
+                            
+                            showinfo(title='', message='Регистрация прошла успешно!')
+                            
+                            # Переход в окно экстрактора признаков
+                            self.state_machine.switch_to_keystroke_extract()
+                    else:
+                        pass
+                else:
+                    showwarning(title='Предупреждение', message='Пользователь с таким именем уже существует!')
+        else:
+            showwarning(title='Предупреждение', message='Заполните имя пользователя!')
+
+        
+    def check_username_db(self, name: str):
+
+        with self.con:
+            cur = self.con.cursor()
+            cur.execute(f'SELECT * FROM {self.user_table_name} WHERE login = ?', (name,))
+
+            user_data = cur.fetchone()
+        
+        print(f'user_data: {user_data}')
+
+        return user_data   
+
+
+    def password_check(self, password: str) -> bool:
+
+        is_valid = True
+      
+        if len(password) < self.min_password_length:
+            showwarning(title='Предупреждение', message='Пароль слишком короткий!')
+            is_valid = False
+          
+        if len(password) > self.max_password_length:
+            showwarning(title='Предупреждение', message='Пароль слишком длинный!')
+            is_valid = False
+          
+        if ' ' in password:
+            showwarning(title='Предупреждение', message='Недопустимо использовать пробелы в пароле!')
+            is_valid = False
+
+        if (not any(char.isdigit() for char in password)) and self.digit_in_password:
+            showwarning(title='Предупреждение', message='Пароль должен содержать по меньшей мере одну цифру!')
+            is_valid = False
+          
+        if (not any(char.isupper() for char in password)) and self.uppercase_letter_in_password:
+            showwarning(title='Предупреждение', message='Пароль должен содержать символы нижнего регистра!')
+            is_valid = False
+          
+        if (not any(char.islower() for char in password)) and self.lowercase_letter_in_password:
+            showwarning(title='Предупреждение', message='Пароль должен содержать символы верхнего регистра!')
+            is_valid = False
+          
+        if (not any(char in self.special_symbols for char in password)) and self.special_symbol_in_password:
+            showwarning(title='Предупреждение', message=f'Пароль должен содержать по меньшей мере один \
+                        специальный сивол! ({self.special_symbols})')
+            is_valid = False
+     
+        return is_valid
+    
 
 
     def login_event(self):
