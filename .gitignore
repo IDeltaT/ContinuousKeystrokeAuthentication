@@ -8,6 +8,7 @@ ContinuousKeystrokeAuthentication/env
 ContinuousKeystrokeAuthentication/ContinuousKeystrokeAuthentication.pyproj
 ContinuousKeystrokeAuthentication.sln
 ContinuousKeystrokeAuthentication/bugs.txt
+ContinuousKeystrokeAuthentication/UserData
 
 # User-specific files
 *.rsuser
