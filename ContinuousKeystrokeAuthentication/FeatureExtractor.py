@@ -36,8 +36,9 @@ class FeatureExtractor:
         self.max_virtual_key = 254       # 0xFE - 'OEMCLEAR'       
         
      
-    def on_press(self,key):
-
+    def on_press(self, key):
+        ''' Действия, производимые при нажатии клавиши '''
+        
         current_time = time() 
 
         if self.start_typing == 0:
@@ -63,11 +64,12 @@ class FeatureExtractor:
          
                 
     def on_release(self, key):
+        ''' Действия, производимые при отпускании клавиши '''
+        
         current_time = time()
         
         self.keys_counter += 1
-        
-        
+               
         if hasattr(key, 'vk'):
             start = self.start_times[key.vk]
             self.start_times[key.vk] = 0
@@ -82,12 +84,10 @@ class FeatureExtractor:
             # Останвить прослушиватель
             return False
         
-        if key == keyboard.Key.esc: # -------------------- !Убрать! --------------------
-            # Останвить прослушиватель при нажатии клавиши 'esc'
-            return False
-        
 
     def feature_preparation(self):
+        ''' Подготовка признаков, с последующей сериализацией и сохранением в файл HDF '''
+        
         keys_hold_time = np.array(self.keys_hold_time)
         keys_down_down_time = np.array(self.keys_down_down_time)
         
@@ -96,20 +96,23 @@ class FeatureExtractor:
         except:
             min_len = min(len(keys_down_down_time), len(keys_hold_time[:len(keys_hold_time) - 1]))
             keys_up_down_time = keys_down_down_time[:min_len] - keys_hold_time[:min_len]
-            print('---- !!! Diff shape !!! ----')
+            print('---- !!! Несоответствие длин массивов !!! ----')
 
         features = []
-            
+        
+        # Подготовка веторов (Key[1]ID, Key[2]ID, Key[1]H, Key[2]H, DD, UD)
         for i in range(len(keys_hold_time) - 1):
             complete_vector = (self.virtual_keys_ID[i], self.virtual_keys_ID[i + 1], keys_hold_time[i],
                                keys_hold_time[i + 1], keys_down_down_time[i], keys_up_down_time[i])
             features.append(complete_vector)
         
-        print(features)
+        #print(features) # Отладка
         
+        # Сериализация списка в файл
         self.save_list_to_file(features)
         #self.read_list_from_file()
 
+        # Сохранение списка в HDF файл, использующийся для обучения модели
         self.save_list_to_hdf5(features)
         
 
