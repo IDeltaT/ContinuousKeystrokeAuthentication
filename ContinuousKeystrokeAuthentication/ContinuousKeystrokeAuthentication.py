@@ -119,7 +119,7 @@ class StateMachine:
         self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
         
         # Экстрактор признаков
-        FE = FeatureExtractor(self.app.registration_required_characters)
+        FE = FeatureExtractor(self.app.registration_required_characters, self.app.models_path, self.app.current_user)
         listener = keyboard.Listener(on_press=FE.on_press, on_release=FE.on_release)
         listener.start()
 
@@ -157,7 +157,8 @@ class App(CTk.CTk):
         
         self.characters_counter = 0      
         self.authentication_required_characters = 40
-        self.registration_required_characters = 200   
+        self.registration_required_characters = 40 # ---
+        self.models_path = 'UserData/Models'
 
         # Путь к базе данных, содержащих данные для парольной аторизации пользователей
         self.user_DB_path = 'UserData/Users.db'
