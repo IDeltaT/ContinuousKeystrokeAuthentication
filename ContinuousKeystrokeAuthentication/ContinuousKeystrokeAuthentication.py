@@ -9,6 +9,7 @@ import os
 import sqlite3
 from passlib.hash import argon2    
 
+from FeatureExtractor import FeatureExtractor
 
 class StateMachine:
 
