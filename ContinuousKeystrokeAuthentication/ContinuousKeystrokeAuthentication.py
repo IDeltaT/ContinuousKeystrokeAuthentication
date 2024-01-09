@@ -9,7 +9,11 @@ import os
 import sqlite3
 from passlib.hash import argon2    
 
+from pynput import keyboard
+from time import time
+import numpy as np
 from FeatureExtractor import FeatureExtractor
+
 
 class StateMachine:
 
@@ -113,6 +117,11 @@ class StateMachine:
         self.forget_all_frames()
         
         self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
+        
+        # Экстрактор признаков
+        FE = FeatureExtractor(self.app.registration_required_characters)
+        listener = keyboard.Listener(on_press=FE.on_press, on_release=FE.on_release)
+        listener.start()
 
 
     def display_user_profile(self):
@@ -146,6 +155,10 @@ class App(CTk.CTk):
                                transitions = StateMachine.transitions, 
                                initial = 'password_authorization')
         
+        self.characters_counter = 0      
+        self.authentication_required_characters = 40
+        self.registration_required_characters = 200   
+
         # Путь к базе данных, содержащих данные для парольной аторизации пользователей
         self.user_DB_path = 'UserData/Users.db'
         self.user_table_name = 'users'
@@ -174,10 +187,6 @@ class App(CTk.CTk):
         
         self.current_question = 0
         self.questions_number = len(self.questions)
-
-        self.characters_counter = 0      
-        self.authentication_required_characters = 40
-        self.registration_required_characters = 200
 
         self.title('Программное средство аутентификации пользователя на основе клавиатурного почерка')
         self.geometry(f'{self.WIDTH}x{self.HEIGHT}') # Ширина и Высота окна
@@ -686,7 +695,7 @@ class App(CTk.CTk):
     def press_key_event_KeyAuthFrame(self, event):
         print(event) # <KeyPress event send_event=True state=Mod1 keysym=w keycode=87 char='w' x=275 y=46>
         self.characters_counter += 1
-            
+
         progressbar_new_value = self.characters_counter / self.authentication_required_characters
 
         self.KeyAuth_progressbar.set(progressbar_new_value)

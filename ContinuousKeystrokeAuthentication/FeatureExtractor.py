@@ -11,8 +11,9 @@ class FeatureExtractor:
     ''' Экстрактор признаков '''
     
     
-    def __init__(self):
+    def __init__(self, keys_required):
                          
+        self.keys_required = keys_required # Количество клавиш, необходимых для остановки слушателя
         self.start_times = np.zeros(254)
         self.start_typing = 0           # Время начала
         self.keys_hold_time = []  
@@ -64,10 +65,12 @@ class FeatureExtractor:
             self.start_times[key.value.vk] = 0
         self.keys_hold_time.append(current_time - start)
         
-        if self.keys_counter > 30:
-            self.feature_preparation()
-            
-        if key == keyboard.Key.esc:
+        if self.keys_counter > self.keys_required:
+            self.feature_preparation()          
+            # Останвить прослушиватель
+            return False
+        
+        if key == keyboard.Key.esc: # -------------------- !Убрать! --------------------
             # Останвить прослушиватель при нажатии клавиши 'esc'
             return False
         
@@ -91,5 +94,5 @@ if __name__ == '__main__':
     
     FE = FeatureExtractor() 
     
-    with keyboard.Listener(on_press = FE.on_press, on_release = FE.on_release) as listener:
+    with keyboard.Listener(on_press=FE.on_press, on_release=FE.on_release) as listener:
         listener.join()
