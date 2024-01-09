@@ -119,7 +119,8 @@ class StateMachine:
         self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
         
         # Экстрактор признаков
-        FE = FeatureExtractor(self.app.registration_required_characters, self.app.models_path, self.app.current_user)
+        FE = FeatureExtractor(self.app.registration_required_characters, self.app.models_path, 
+                              self.app.current_user, self.app.sliding_window_size)
         listener = keyboard.Listener(on_press=FE.on_press, on_release=FE.on_release)
         listener.start()
 
@@ -159,6 +160,7 @@ class App(CTk.CTk):
         self.authentication_required_characters = 40
         self.registration_required_characters = 40 # ---
         self.models_path = 'UserData/Models'
+        self.sliding_window_size = 30 # Размер скользящего окна
 
         # Путь к базе данных, содержащих данные для парольной аторизации пользователей
         self.user_DB_path = 'UserData/Users.db'
