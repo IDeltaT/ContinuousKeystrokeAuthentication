@@ -158,7 +158,7 @@ class App(CTk.CTk):
         
         self.characters_counter = 0      
         self.authentication_required_characters = 40
-        self.registration_required_characters = 2000 # ---
+        self.registration_required_characters = 40 # ---
         self.models_path = 'UserData/Models'
         self.sliding_window_size = 30 # Размер скользящего окна
 
@@ -454,8 +454,8 @@ class App(CTk.CTk):
         self.KeyExtr_frame_name_label.grid(row=0, column=0, padx=30, pady=(20, 10))
 
         KeyExtr_frame_instruction_text = 'для успешного обучения искусственной нейронной сети\n\
-определять вас как "Своего" и блокировать доступ\n"Чужому", вам следует отвечать на заданные вопросы,\n\
-пока не заполнится шкала (вопросы можно менять)\n\nВОПРОСЫ:'
+определять вас как "Своего" вам следует печатать\n осмысленный текст, пока не заполнится шкала\n\
+(рекомендуется отвечать на наводящие вопросы)\n\nВОПРОСЫ:'
         # Label: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
         self.KeyExtr_frame_instruction_label = CTk.CTkLabel(self.keystroke_extract_frame, 
                                                             text=KeyExtr_frame_instruction_text, 
@@ -508,7 +508,7 @@ class App(CTk.CTk):
 
         # Label: Ответы
         self.KeyExtr_answers_label = CTk.CTkLabel(self.keystroke_extract_frame, 
-                                                  text='ПОЛЕ, ДЛЯ ВВОДА ОТВЕТОВ:', 
+                                                  text='ПОЛЕ, ДЛЯ ВВОДА ТЕКСТА:', 
                                                   font=CTk.CTkFont(size=18, weight='bold'))
         self.KeyExtr_answers_label.grid(row=4, column=0, padx=30, pady=(5, 5))
 

@@ -129,9 +129,15 @@ class FeatureExtractor:
         # Сохранение списка в HDF файл, использующийся для обучения модели
         self.save_list_to_hdf5()
         
+        showinfo(title='', message='Данные клавиатурного почерка успешно собраны. Начат процесс обучения \
+модели. Дождитесь уведомления о завершении обучения.')
+        
         neural_net_model = NeuralNetModel(train_data, train_labels, self.models_path, self.current_user)
         neural_net_model.train_model()
         neural_net_model.save_model()
+        
+        showinfo(title='', message='Модель успешно обучена! Авторизуйтесь, используя введенные ранее учетные \
+данные.')
 
 
     def save_list_to_file(self, list_to_save: list):
