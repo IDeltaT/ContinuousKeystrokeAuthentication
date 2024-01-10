@@ -8,6 +8,7 @@ import pickle
 import h5py
 import os
 
+
 # Hold time – время между нажатием и отпусканием клавиши (H).
 # Keydown-Keydown time – время между нажатиями последовательных клавиш (DD).
 # Keyup-Keydown time – время между отпусканием одной клавиши и нажатием следующей клавиши (UD).
@@ -15,8 +16,7 @@ import os
          
 
 class FeatureExtractor:
-    ''' Экстрактор признаков '''
-    
+    ''' Экстрактор признаков '''   
     
     def __init__(self, keys_required: int, models_path: str, current_user: str, sliding_window_size: int):
                    
@@ -129,6 +129,10 @@ class FeatureExtractor:
         # Сохранение списка в HDF файл, использующийся для обучения модели
         self.save_list_to_hdf5()
         
+        neural_net_model = NeuralNetModel(train_data, train_labels, self.models_path, self.current_user)
+        neural_net_model.train_model()
+        neural_net_model.save_model()
+
 
     def save_list_to_file(self, list_to_save: list):
         ''' Сериализация списка в файл '''
@@ -207,7 +211,6 @@ class FeatureExtractor:
             hdf.create_dataset('train_data', data = self.sliding_window_array)
             hdf.create_dataset('train_labels', data = self.train_labels)
             
-
 
 
 if __name__ == '__main__':
