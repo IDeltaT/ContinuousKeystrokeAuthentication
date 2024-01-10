@@ -119,7 +119,7 @@ class StateMachine:
         self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
         
         # Экстрактор признаков
-        FE = FeatureExtractor(self.app.registration_required_characters, self.app.models_path, 
+        FE = FeatureExtractor(self.app, self.app.registration_required_characters, self.app.models_path, 
                               self.app.current_user, self.app.sliding_window_size)
         listener = keyboard.Listener(on_press=FE.on_press, on_release=FE.on_release)
         listener.start()

@@ -18,8 +18,10 @@ import os
 class FeatureExtractor:
     ''' Экстрактор признаков '''   
     
-    def __init__(self, keys_required: int, models_path: str, current_user: str, sliding_window_size: int):
+    def __init__(self, app, keys_required: int, models_path: str, current_user: str, sliding_window_size: int):
                    
+        self.app = app # Доступ к виджетам приложения
+        
         self.keys_required = keys_required # Количество клавиш, необходимых для остановки слушателя
         self.models_path = models_path     # Путь сохранения моделей
         self.current_user = current_user   # Имя текущего пользователя
@@ -132,9 +134,16 @@ class FeatureExtractor:
         showinfo(title='', message='Данные клавиатурного почерка успешно собраны. Начат процесс обучения \
 модели. Дождитесь уведомления о завершении обучения.')
         
+        # Отключить кнопку "вернуться" в окне Экстрактора признаков
+        self.app.KeyExtr_to_PassAuth_frame_button.configure(state='disabled')
+
+        # Тренировка и сохранение модели, на полученных ранее данных.
         neural_net_model = NeuralNetModel(train_data, train_labels, self.models_path, self.current_user)
         neural_net_model.train_model()
         neural_net_model.save_model()
+        
+        # Включить кнопку "вернуться" в окне Экстрактора признаков
+        self.app.KeyExtr_to_PassAuth_frame_button.configure(state='normal')
         
         showinfo(title='', message='Модель успешно обучена! Авторизуйтесь, используя введенные ранее учетные \
 данные.')
