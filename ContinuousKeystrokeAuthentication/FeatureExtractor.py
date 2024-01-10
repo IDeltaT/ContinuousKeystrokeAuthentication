@@ -166,6 +166,8 @@ class FeatureExtractor:
     
 
     def prepear_data_to_train(self, list_to_save: list):
+        ''' Подготовка данных к обучению модели '''
+        
         features_matrix = np.array(list_to_save)
         
         #print(features_matrix) # Отладка
@@ -202,18 +204,18 @@ class FeatureExtractor:
                                                                       self.fetures_number)
         # Отладка      
         #print(self.train_labels)
-        print(np.shape(self.train_labels)) # (10, 1)       
+        #print(np.shape(self.train_labels)) # (10, 1)       
         #print(self.sliding_window_array)
-        print(np.shape(self.sliding_window_array)) # (10, 30, 6)
+        #print(np.shape(self.sliding_window_array)) # (10, 30, 6)
 
         # Перемешать массивы
         self.sliding_window_array, self.train_labels = shuffle(self.sliding_window_array, self.train_labels)
         
         # Отладка
         #print(self.train_labels)
-        print(np.shape(self.train_labels)) # (10, 1)        
+        #print(np.shape(self.train_labels)) # (10, 1)        
         #print(self.sliding_window_array)
-        print(np.shape(self.sliding_window_array)) # (10, 30, 6)
+        #print(np.shape(self.sliding_window_array)) # (10, 30, 6)
         
         return (self.sliding_window_array, self.train_labels)
     
