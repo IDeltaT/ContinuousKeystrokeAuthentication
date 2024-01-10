@@ -1,3 +1,4 @@
+from tkinter.messagebox import showerror, showwarning, showinfo
 from NeuralNetModel import NeuralNetModel
 from sklearn.utils import shuffle
 from pynput import keyboard
@@ -5,11 +6,13 @@ from time import time
 import numpy as np
 import pickle
 import h5py
+import os
 
 # Hold time – время между нажатием и отпусканием клавиши (H).
 # Keydown-Keydown time – время между нажатиями последовательных клавиш (DD).
 # Keyup-Keydown time – время между отпусканием одной клавиши и нажатием следующей клавиши (UD).
 # Полный вектор: (Key[1]ID, Key[2]ID, Key[1]H, Key[2]H, DD, UD)
+         
 
 class FeatureExtractor:
     ''' Экстрактор признаков '''
@@ -36,7 +39,14 @@ class FeatureExtractor:
         self.keys_counter = 0        
         self.max_virtual_key = 254       # 0xFE - 'OEMCLEAR'       
         
-     
+        # Проверка на наличие папки 'Models'
+        self.models_path = 'UserData/Models'
+        is_exist = os.path.exists(self.models_path)
+        if not is_exist:
+            os.makedirs(self.models_path)
+            showinfo(title='Предупреждение', message='Папка с моделями не обнаружена (Создана новая папка).')
+
+
     def on_press(self, key):
         ''' Действия, производимые при нажатии клавиши '''
         
@@ -113,8 +123,11 @@ class FeatureExtractor:
         self.save_list_to_file(features)
         #self.read_list_from_file()
 
+        # Подготовка данных, для обучения модели нейронной сети
+        train_data, train_labels = self.prepear_data_to_train(features)
+
         # Сохранение списка в HDF файл, использующийся для обучения модели
-        self.save_list_to_hdf5(features)
+        self.save_list_to_hdf5()
         
 
     def save_list_to_file(self, list_to_save: list):
@@ -133,9 +146,7 @@ class FeatureExtractor:
             return list_from_file
     
 
-    def save_list_to_hdf5(self, list_to_save: list):
-        ''' Сохранение списка в файл формата HDF '''
-        
+    def prepear_data_to_train(self, list_to_save: list):
         features_matrix = np.array(list_to_save)
         
         #print(features_matrix) # Отладка
@@ -184,11 +195,19 @@ class FeatureExtractor:
         print(np.shape(self.train_labels)) # (10, 1)        
         #print(self.sliding_window_array)
         print(np.shape(self.sliding_window_array)) # (10, 30, 6)
+        
+        return (self.sliding_window_array, self.train_labels)
+    
+
+    def save_list_to_hdf5(self):
+        ''' Сохранение списка в файл формата HDF '''
 
         # Сохранение данных для обучения моедели в файл формата HDF
         with h5py.File(f'{self.models_path}/{self.current_user}.h5','w') as hdf: 
-            hdf.create_dataset('train_data',data = self.sliding_window_array)
-            hdf.create_dataset('train_labels',data = self.train_labels)
+            hdf.create_dataset('train_data', data = self.sliding_window_array)
+            hdf.create_dataset('train_labels', data = self.train_labels)
+            
+
 
 
 if __name__ == '__main__':

@@ -754,6 +754,7 @@ class App(CTk.CTk):
         if not is_exist:
             # 'UserData/Users.db'
             os.makedirs(self.user_DB_path.split('/')[0])
+            
             showinfo(title='Предупреждение', message='База данных пользователей не обнаружена (Создана новая база данных).')
             
             con = sqlite3.connect(self.user_DB_path)
