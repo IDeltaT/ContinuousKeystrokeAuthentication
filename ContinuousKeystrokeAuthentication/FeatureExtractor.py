@@ -1,3 +1,4 @@
+from NeuralNetModel import NeuralNetModel
 from sklearn.utils import shuffle
 from pynput import keyboard
 from time import time
