@@ -5,6 +5,7 @@ from transitions import Machine
 from tkinter.messagebox import showerror, showwarning, showinfo
 
 import os
+import ctypes
 
 import sqlite3
 from passlib.hash import argon2    
@@ -90,6 +91,7 @@ class StateMachine:
 
 
     def display_registration(self):
+        self.app.lock_work_station() # Заблокировать рабочую станцию
         print('display_registration')
         self.forget_all_frames()
         self.app.focus() # Убрать фокус с TextBox'а и остальных полей
@@ -896,6 +898,12 @@ class App(CTk.CTk):
 
         return user_data
     
+    
+    def lock_work_station(self):
+        ''' Заблокировать рабочую станцию '''
+        
+        ctypes.windll.user32.LockWorkStation()
+
 
     def login_event(self):
         # "Заглушка"
