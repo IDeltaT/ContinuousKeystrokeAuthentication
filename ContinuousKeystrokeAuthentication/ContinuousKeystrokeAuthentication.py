@@ -348,7 +348,7 @@ class App(CTk.CTk):
         self.keystroke_authorization_frame_name_label.grid(row=0, column=0, padx=30, pady=(20, 10))
 
         KeyAuth_frame_instruction_text = 'для успешного прохождения данного этапа аутентификации,\n\
-посторайтесь дать развернутые ответы на поставленные вопросы\n(при необходимости, можно заменить вопрос)\n\n\
+вам следует печатать осмысленный текст. \n(при необходимости, можно использовать наводящие вопросы)\n\n\
 ВОПРОСЫ:'
         # Label: Инструкция прохождения биометрической аутентификации по клавиатурному почерку
         self.KeyAuth_instruction_label = CTk.CTkLabel(self.keystroke_authorization_frame, 
