@@ -139,8 +139,11 @@ class FeatureExtractor:
 
         # Тренировка и сохранение модели, на полученных ранее данных.
         neural_net_model = NeuralNetModel(train_data, train_labels, self.models_path, self.current_user)
-        neural_net_model.train_model()
+        neural_net_model.prepear_data()
+        neural_net_model.train_model()       
+        neural_net_model.evaluation()
         neural_net_model.save_model()
+        #neural_net_model.concatinate_HDF_files()
         
         # Включить кнопку "вернуться" в окне Экстрактора признаков
         self.app.KeyExtr_to_PassAuth_frame_button.configure(state='normal')
