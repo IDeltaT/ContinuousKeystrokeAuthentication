@@ -13,7 +13,10 @@ from passlib.hash import argon2
 from pynput import keyboard
 from time import time
 import numpy as np
+
+from KeystrokeAuthenticator import KeystrokeAuthenticator
 from FeatureExtractor import FeatureExtractor
+
 
 
 class StateMachine:
@@ -108,8 +111,14 @@ class StateMachine:
         self.forget_all_frames()        
 
         self.frames['keystroke_authorization_frame'].grid(row=0, column=0, sticky='ns')
-
         
+        # Аутентификатор по клавиатурному почерку
+        KA = KeystrokeAuthenticator(self.app, self.app.registration_required_characters, self.app.models_path, 
+                                    self.app.current_user, self.app.sliding_window_size)
+        listener = keyboard.Listener(on_press=KA.on_press, on_release=KA.on_release)
+        listener.start()
+        
+
     def display_keystroke_extract(self):
         print('display_keystroke_extract')
         self.app.characters_counter = 0 # Сбросить кол-во введенных символов
@@ -716,7 +725,7 @@ class App(CTk.CTk):
 
         if self.characters_counter >= self.authentication_required_characters:
             self.focus() # Убрать фокус с TextBox'а
-            self.state_machine.switch_to_user_profile()
+            #self.state_machine.switch_to_user_profile()
   
         
     def press_key_event_KeyExtrFrame(self, event):
