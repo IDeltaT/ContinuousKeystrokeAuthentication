@@ -436,8 +436,15 @@ class App(CTk.CTk):
                                                               command=self.state_machine.switch_to_password_authorization, 
                                                               width=200,
                                                               font=CTk.CTkFont(size=14, weight='bold'))
-        self.KeyAuth_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(20, 10))
-        
+        self.KeyAuth_to_PassAuth_frame_button.grid(row=7, column=0, padx=30, pady=(12, 10))
+ 
+        # Button: "Войти (через блокировку)"
+        self.KeyAuth_to_Profile_frame_button = CTk.CTkButton(self.keystroke_authorization_frame, 
+                                                             text='войти (через блокировку)', 
+                                                             command=self.sign_in_profile_via_lock, 
+                                                             width=200,
+                                                             font=CTk.CTkFont(size=13, weight='bold'))
+        self.KeyAuth_to_Profile_frame_button.grid(row=8, column=0, padx=30, pady=(5, 5))
 
         # ------------------------------------ keystroke extract frame ------------------------------------ #
 
@@ -713,6 +720,8 @@ class App(CTk.CTk):
   
         
     def press_key_event_KeyExtrFrame(self, event):
+        ''' Заполнение прогресс бара в окне "Экстрактор признаков" '''
+        
         print(event) # <KeyPress event send_event=True state=Mod1 keysym=w keycode=87 char='w' x=275 y=46>
         self.characters_counter += 1
             
@@ -722,6 +731,8 @@ class App(CTk.CTk):
         
 
     def display_next_question(self, label, textbox):
+        ''' Отобразить следующий вопрос в окне "Экстрактор признаков" / "Аутентификация по клав. почерку" '''
+        
         self.current_question = ((self.current_question + 1) % self.questions_number)
         label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
@@ -736,6 +747,8 @@ class App(CTk.CTk):
 
 
     def display_previous_question(self, label, textbox):
+        ''' Отобразить предыдущий вопрос в окне "Экстрактор признаков" / "Аутентификация по клав. почерку" '''
+        
         self.current_question = ((self.current_question - 1) % self.questions_number)
         label.configure(text=f'{self.current_question + 1}/{self.questions_number}')
         
@@ -750,6 +763,8 @@ class App(CTk.CTk):
 
 
     def init_user_DB(self):
+        ''' Инициализация БД '''
+        
         # Если файл БД не существует, создать новый, вывести предупреждение  
         
         is_exist = os.path.exists(self.user_DB_path)
@@ -773,6 +788,7 @@ class App(CTk.CTk):
 
 
     def registration_new_user(self):
+        ''' Регистрация нового пользователя / кнопка "зарегистрироваться" в меню регистрации '''
         
         username = self.registration_username_entry.get()
         
@@ -812,7 +828,8 @@ class App(CTk.CTk):
 
 
     def password_check(self, password: str) -> bool:
-
+        ''' Проверить валидность пароля '''
+        
         is_valid = True
       
         if len(password) < self.min_password_length:
@@ -848,11 +865,10 @@ class App(CTk.CTk):
     
     
     def sign_in(self):
-    
-        username = self.username_entry.get()
+        ''' Первый этап (парольная авторизация) / кнопка "войти" в меню парольной авторизации '''
         
-        password = self.password_entry.get()
-        
+        username = self.username_entry.get()     
+        password = self.password_entry.get()     
 
         if username:
             if ' ' in username:
@@ -885,9 +901,9 @@ class App(CTk.CTk):
             showwarning(title='', message='Введите имя пользователя!')
 
 
-
     def check_username_db(self, name: str):
-
+        ''' Проверить, существует ли пользователь в БД '''
+        
         with self.con:
             cur = self.con.cursor()
             cur.execute(f'SELECT * FROM {self.user_table_name} WHERE login = ?', (name,))
@@ -898,7 +914,14 @@ class App(CTk.CTk):
 
         return user_data
     
-    
+
+    def sign_in_profile_via_lock(self):
+        ''' Войти в профиль, через блокировку станции '''
+        
+        self.lock_work_station()
+        self.state_machine.switch_to_user_profile()
+
+
     def lock_work_station(self):
         ''' Заблокировать рабочую станцию '''
         
