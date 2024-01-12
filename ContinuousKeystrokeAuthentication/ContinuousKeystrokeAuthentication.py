@@ -158,7 +158,7 @@ class App(CTk.CTk):
         
         self.characters_counter = 0      
         self.authentication_required_characters = 40
-        self.registration_required_characters = 40 # ---
+        self.registration_required_characters = 200 # ---
         self.models_path = 'UserData/Models'
         self.sliding_window_size = 30 # Размер скользящего окна
 

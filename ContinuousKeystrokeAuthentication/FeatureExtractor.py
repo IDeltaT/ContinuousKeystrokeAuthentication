@@ -153,7 +153,7 @@ class FeatureExtractor:
         
         showinfo(title='', message='Модель успешно обучена! Авторизуйтесь, используя введенные ранее учетные \
 данные.')
-
+        self.app.state_machine.switch_to_password_authorization()
 
     def save_list_to_file(self, list_to_save: list):
         ''' Сериализация списка в файл '''

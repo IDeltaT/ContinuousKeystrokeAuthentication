@@ -67,10 +67,12 @@ class NeuralNetModel:
         
         self.test_data = self.train_data[:100]
         self.test_labels = self.train_labels[:100]
+        self.test_labels = np.empty(100)
+        self.test_labels.fill(1)
         
         self.train_data = self.train_data[100:]
         self.train_labels = self.train_labels[100:]
-
+   
         # Отладка
         print(np.shape(self.test_data))      # (x, 30, 6)
         print(np.shape(self.test_labels))    # (x, 1)
@@ -136,11 +138,10 @@ class NeuralNetModel:
         
         # Дополнительная проверка на другом наборе данных
         train_data_other, train_labels_other = NeuralNetModel.open_hdf5_file('2000char')
- 
-        # Метка: 1
-        self.model.evaluate(self.test_data, self.test_labels, batch_size=self.batch_size, verbose=1)
         
-        probability_model = keras.models.Sequential([self.model, keras.layers.Softmax()])        
+        # Метка: 1
+        self.model.evaluate(self.test_data, self.test_labels, batch_size=self.batch_size, verbose=1)   
+        probability_model = keras.models.Sequential([self.model, keras.layers.Softmax()]) 
         
         predictions = probability_model(self.test_data)
         prediction = predictions[0]
@@ -148,7 +149,7 @@ class NeuralNetModel:
         print(f'{prediction}: {result}')
         
         print('---------------')
-        
+
         # Метка: 0
         self.model.evaluate(self.train_data_enemy[:100], 
                             self.train_labels_enemy[:100], 
@@ -158,8 +159,6 @@ class NeuralNetModel:
         probability_model = keras.models.Sequential([self.model, keras.layers.Softmax()])        
         
         predictions = probability_model(self.train_data_enemy[:100])
-
-        predictions = probability_model(self.test_data)
         prediction = predictions[0]
         result = np.argmax(prediction)
         print(f'{prediction}: {result}')
