@@ -115,10 +115,13 @@ class FeatureExtractor:
         
         # Подготовка веторов (Key[1]ID, Key[2]ID, Key[1]H, Key[2]H, DD, UD)
         for i in range(len(keys_hold_time) - 1):
-            complete_vector = (self.virtual_keys_ID[i], self.virtual_keys_ID[i + 1], keys_hold_time[i],
-                               keys_hold_time[i + 1], keys_down_down_time[i], keys_up_down_time[i])
-            features.append(complete_vector)
-        
+            try:
+                complete_vector = (self.virtual_keys_ID[i], self.virtual_keys_ID[i + 1], keys_hold_time[i],
+                                   keys_hold_time[i + 1], keys_down_down_time[i], keys_up_down_time[i])
+                features.append(complete_vector)
+            except:
+                break
+            
         #print(features) # Отладка
         
         # Сериализация списка в файл
