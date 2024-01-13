@@ -155,6 +155,9 @@ class StateMachine:
 
         self.frames['user_profile_frame'].grid(row=0, column=0, sticky='ns')
         
+        # Отчистить поле замены пароля
+        self.app.settings_frame_change_password_entry.delete(0, CTk.END) 
+        
         with open(f'{self.app.logs_path}/{self.app.logs_file_name}.log', 'r') as logs:
             for log in logs:
                 if ('Finished' in log) or ('Executed' in log):
