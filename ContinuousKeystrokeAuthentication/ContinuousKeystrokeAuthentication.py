@@ -55,7 +55,7 @@ class StateMachine:
                      'after': 'display_keystroke_authorization'},
                      
                    { 'trigger': 'switch_to_keystroke_extract', 
-                     'source': 'registration', 
+                     'source': ['registration', 'user_profile'], 
                      'dest': 'keystroke_extract',
                      'after': 'display_keystroke_extract'},
 
@@ -634,7 +634,7 @@ class App(CTk.CTk):
         # Button: "сбросить модель"
         self.settings_frame_reset_model_button = CTk.CTkButton(self.settings_frame, 
                                                                text='сбросить модель', 
-                                                               command=self.login_event, 
+                                                               command=self.state_machine.switch_to_keystroke_extract, 
                                                                width=200,
                                                                font=CTk.CTkFont(size=14, weight='bold'))
         self.settings_frame_reset_model_button.grid(row=3, column=0, padx=0, pady=(10, 10))
