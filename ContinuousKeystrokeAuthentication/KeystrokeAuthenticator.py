@@ -25,6 +25,7 @@ class KeystrokeAuthenticator:
         self.sliding_window_size = sliding_window_size  # Размер скользящего окна
 
         self.sliding_window_array = np.array([]) # Скользящее окно
+        self.fetures_number = 6                  # Кол-во признаков в завершенном векторе
         
         self.start_times = np.zeros(254)
         self.start_typing = 0            # Время начала
@@ -39,6 +40,9 @@ class KeystrokeAuthenticator:
         self.models_path = 'UserData/Models'
         self.model_prefix = 'Trained_Model_'
         self.model = keras.models.load_model(f'{self.models_path}/{self.model_prefix}{self.current_user}.h5')
+        
+        self.predictions = []   # Массив с предсказаниями обученной модели
+        self.tolerance = 0.7    # Пороговое значение допуска аутентификации по клавиатурному почерку
         
         # Проверка на наличие папки 'Models'        
         is_exist = os.path.exists(self.models_path)
@@ -67,11 +71,11 @@ class KeystrokeAuthenticator:
         if hasattr(key, 'vk'):
             if self.start_times[key.vk] == 0:
                 self.start_times[key.vk] = current_time
-                self.virtual_keys_ID.append(key.vk)
+                self.virtual_keys_ID.append(key.vk/self.max_virtual_key)
         else:
             if self.start_times[key.value.vk] == 0:
                 self.start_times[key.value.vk] = current_time 
-                self.virtual_keys_ID.append(key.value.vk)
+                self.virtual_keys_ID.append(key.value.vk/self.max_virtual_key)
          
                 
     def on_release(self, key):
@@ -89,8 +93,79 @@ class KeystrokeAuthenticator:
             start = self.start_times[key.value.vk]
             self.start_times[key.value.vk] = 0
         self.keys_hold_time.append(current_time - start)
+                 
         
-        if self.keys_counter > self.keys_required:
-            #self.feature_preparation()          
-            # Останвить прослушиватель
-            return False
+        # Если нажатых клавиш, больше скользящего окна
+        if self.keys_counter > self.sliding_window_size:
+            self.feature_preparation()                      
+            
+            if self.keys_counter > self.keys_required:
+                self.predictions = np.array(self.predictions)
+                print(self.predictions)
+                print(np.shape(self.predictions))
+                mean = np.mean(self.predictions)
+                print(f'mean: {mean}')
+                
+                if mean > self.tolerance:
+                    self.app.state_machine.switch_to_user_profile()
+                    showinfo(title='', message='Аутентификация по клавиатурному почерку пройдена успешно!')
+                else:
+                    self.app.state_machine.switch_to_password_authorization()
+                    showinfo(title='', message='Аутентификация по клавиатурному почерку не пройдена. Повторите попытку.')
+                
+                # Останвить прослушиватель
+                return False  
+      
+
+    def feature_preparation(self):
+        ''' Подготовка признаков '''
+        
+        index = self.keys_counter - (self.sliding_window_size + 1)
+        print(index)
+        
+        keys_hold_time = np.array(self.keys_hold_time[index:self.keys_counter])
+        keys_down_down_time = np.array(self.keys_down_down_time[index:self.keys_counter])
+        
+        #print(np.shape(keys_hold_time))
+        #print(np.shape(keys_down_down_time))
+        
+        # Try/Except?
+        #keys_up_down_time = keys_down_down_time - keys_hold_time[:len(keys_hold_time) - 1]
+        try:
+            keys_up_down_time = keys_down_down_time - keys_hold_time[:len(keys_hold_time) - 1]
+        except:
+            min_len = min(len(keys_down_down_time), len(keys_hold_time[:len(keys_hold_time) - 1]))
+            keys_up_down_time = keys_down_down_time[:min_len] - keys_hold_time[:min_len]
+            print('---- !!! Несоответствие длин массивов !!! ----')
+            
+        features = []        
+        
+        # Подготовка веторов (Key[1]ID, Key[2]ID, Key[1]H, Key[2]H, DD, UD)
+        for i in range(len(keys_hold_time) - 1):
+            try:
+                complete_vector = (self.virtual_keys_ID[i + index], 
+                                   self.virtual_keys_ID[i + index + 1], 
+                                   keys_hold_time[i],
+                                   keys_hold_time[i + 1], 
+                                   keys_down_down_time[i], 
+                                   keys_up_down_time[i])
+                features.append(complete_vector)
+            except:
+                print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+
+        features = np.array(features)
+        try:
+            features = features.reshape(1, self.sliding_window_size, self.fetures_number) # (1, 30, 6)
+            prediction = self.model.predict(x=features, verbose=0)
+            print(prediction)
+            self.predictions.append(prediction[0][1])
+        except:
+            pass
+        
+        
+
+if __name__ == '__main__':
+    
+    KA = KeystrokeAuthenticator()     
+    with keyboard.Listener(on_press=KA.on_press, on_release=KA.on_release) as listener:
+        listener.join()

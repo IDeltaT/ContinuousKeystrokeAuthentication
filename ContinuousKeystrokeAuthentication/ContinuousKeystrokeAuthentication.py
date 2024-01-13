@@ -113,7 +113,7 @@ class StateMachine:
         self.frames['keystroke_authorization_frame'].grid(row=0, column=0, sticky='ns')
         
         # Аутентификатор по клавиатурному почерку
-        KA = KeystrokeAuthenticator(self.app, self.app.registration_required_characters, self.app.models_path, 
+        KA = KeystrokeAuthenticator(self.app, self.app.authentication_required_characters, self.app.models_path, 
                                     self.app.current_user, self.app.sliding_window_size)
         listener = keyboard.Listener(on_press=KA.on_press, on_release=KA.on_release)
         listener.start()
@@ -168,7 +168,7 @@ class App(CTk.CTk):
                                initial = 'password_authorization')
         
         self.characters_counter = 0      
-        self.authentication_required_characters = 40
+        self.authentication_required_characters = 50
         self.registration_required_characters = 3000 # ---
         self.models_path = 'UserData/Models'
         self.sliding_window_size = 30 # Размер скользящего окна
@@ -724,6 +724,7 @@ class App(CTk.CTk):
         print(f'{self.characters_counter} / {self.authentication_required_characters}') # Debug
 
         if self.characters_counter >= self.authentication_required_characters:
+            pass
             self.focus() # Убрать фокус с TextBox'а
             #self.state_machine.switch_to_user_profile()
   
