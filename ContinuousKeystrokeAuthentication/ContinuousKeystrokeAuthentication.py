@@ -151,9 +151,8 @@ class StateMachine:
         self.frames['user_profile_frame'].grid(row=0, column=0, sticky='ns')
         
 
-
-
 class App(CTk.CTk):
+    ''' Пользовательский графический интерфейс '''
     
     # Размеры окна (В пикселях)
     WIDTH = 900
