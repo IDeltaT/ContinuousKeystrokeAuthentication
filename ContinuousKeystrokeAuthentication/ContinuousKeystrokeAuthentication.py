@@ -1,14 +1,18 @@
-﻿import tkinter as TK
-from PIL import Image
+﻿from tkinter.messagebox import showerror, showwarning, showinfo
 import customtkinter as CTk
+import tkinter as TK
+
+from PIL import Image
+
 from transitions import Machine
-from tkinter.messagebox import showerror, showwarning, showinfo
 
-import os
 import ctypes
+import os
 
+from passlib.hash import argon2   
 import sqlite3
-from passlib.hash import argon2    
+
+import logging
 
 from pynput import keyboard
 from time import time
@@ -16,8 +20,6 @@ import numpy as np
 
 from KeystrokeAuthenticator import KeystrokeAuthenticator
 from FeatureExtractor import FeatureExtractor
-
-import logging
 
 
 
@@ -37,7 +39,6 @@ class StateMachine:
 
     states = ['password_authorization', 'registration', 'keystroke_authorization', 
               'keystroke_extract','user_profile']
-
 
     transitions = [{ 'trigger': 'switch_to_password_authorization', 
                      'source': '*', 
@@ -172,7 +173,6 @@ class StateMachine:
                     self.app.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
                 
        
-
 class App(CTk.CTk):
     ''' Пользовательский графический интерфейс '''
     
@@ -183,7 +183,6 @@ class App(CTk.CTk):
     CTk.set_appearance_mode('dark')         # Тема приложения по умолчанию: Темная
     CTk.set_default_color_theme('green')    # Цветовая тема приложения по умолчанию: Зеленая
     
-
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -239,8 +238,6 @@ class App(CTk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         
-        #self.current_user = 'IKSuser'
-        #self.current_user = 'Anonim'
         self.current_user = None
         
         self.alert_CheckBox_BooleanVar = CTk.BooleanVar()
@@ -745,6 +742,8 @@ class App(CTk.CTk):
 
 
     def press_key_event_KeyAuthFrame(self, event):
+        ''' Заполнение прогресс бара в окне "Аутентификация по клавиатурномуу почерку" '''
+        
         print(event) # <KeyPress event send_event=True state=Mod1 keysym=w keycode=87 char='w' x=275 y=46>
         self.characters_counter += 1
 
