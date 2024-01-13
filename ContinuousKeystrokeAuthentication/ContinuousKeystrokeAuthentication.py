@@ -112,6 +112,9 @@ class StateMachine:
 
         self.frames['keystroke_authorization_frame'].grid(row=0, column=0, sticky='ns')
         
+        self.app.KeyAuth_answers_textbox.delete('1.0', CTk.END)  # Отчистка ТекстБокса
+        self.app.KeyAuth_progressbar.set(0) # Отчистка Прогресс-Бара
+        
         # Аутентификатор по клавиатурному почерку
         KA = KeystrokeAuthenticator(self.app, self.app.authentication_required_characters, self.app.models_path, 
                                     self.app.current_user, self.app.sliding_window_size)
@@ -129,6 +132,9 @@ class StateMachine:
         
         self.frames['keystroke_extract_frame'].grid(row=0, column=0, sticky='ns')
         
+        self.app.KeyExtr_answers_textbox.delete('1.0', CTk.END)  # Отчистка ТекстБокса
+        self.app.KeyExtr_progressbar.set(0) # Отчистка Прогресс-Бара
+        
         # Экстрактор признаков
         FE = FeatureExtractor(self.app, self.app.registration_required_characters, self.app.models_path, 
                               self.app.current_user, self.app.sliding_window_size)
@@ -137,11 +143,12 @@ class StateMachine:
 
 
     def display_user_profile(self):
-        print('display_user_profile')  
+        print('display_user_profile')
         self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         self.forget_all_frames()
 
         self.frames['user_profile_frame'].grid(row=0, column=0, sticky='ns')
+        
 
 
 
