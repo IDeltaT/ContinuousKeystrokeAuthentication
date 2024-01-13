@@ -40,6 +40,10 @@ class KeystrokeAuthenticator:
         self.models_path = 'UserData/Models'
         self.model_prefix = 'Trained_Model_'
         self.model = keras.models.load_model(f'{self.models_path}/{self.model_prefix}{self.current_user}.h5')
+
+        # Прогрев модели :)
+        features = np.zeros(180).reshape(1, 30, 6) # (1, 30, 6)
+        prediction = self.model.predict(x=features, verbose=0)
         
         self.predictions = []   # Массив с предсказаниями обученной модели
         self.tolerance = 0.7    # Пороговое значение допуска аутентификации по клавиатурному почерку
@@ -49,7 +53,7 @@ class KeystrokeAuthenticator:
         if not is_exist:
             os.makedirs(self.models_path)
             showinfo(title='Предупреждение', message='Папка с моделями не обнаружена (Создана новая папка).')
-            
+                        
 
     def on_press(self, key):
         ''' Действия, производимые при нажатии клавиши '''
@@ -60,12 +64,8 @@ class KeystrokeAuthenticator:
             self.start_typing = current_time
 
         if self.last_key_enterd_time != 0:
-            if hasattr(key, 'vk'): # Проверка виртуального атрибута
-                if self.start_times[key.vk] == 0: # Рассчитывание Keydown-Keydown time
-                    self.keys_down_down_time.append(current_time - self.last_key_enterd_time)
-            elif self.start_times[key.value.vk] == 0:
-                self.keys_down_down_time.append(current_time - self.last_key_enterd_time)
-                
+            self.keys_down_down_time.append(current_time - self.last_key_enterd_time)                  
+               
         self.last_key_enterd_time = current_time
         
         if hasattr(key, 'vk'):
@@ -92,30 +92,37 @@ class KeystrokeAuthenticator:
         else: 
             start = self.start_times[key.value.vk]
             self.start_times[key.value.vk] = 0
-        self.keys_hold_time.append(current_time - start)
-                 
+        self.keys_hold_time.append(current_time - start)             
         
         # Если нажатых клавиш, больше скользящего окна
         if self.keys_counter > self.sliding_window_size:
             self.feature_preparation()                      
             
             if self.keys_counter > self.keys_required:
-                self.predictions = np.array(self.predictions)
-                print(self.predictions)
-                print(np.shape(self.predictions))
-                mean = np.mean(self.predictions)
-                print(f'mean: {mean}')
                 
-                if mean > self.tolerance:
-                    self.app.state_machine.switch_to_user_profile()
-                    showinfo(title='', message='Аутентификация по клавиатурному почерку пройдена успешно!')
-                else:
+                if len(self.predictions) < 4:
                     self.app.state_machine.switch_to_password_authorization()
-                    showinfo(title='', message='Аутентификация по клавиатурному почерку не пройдена. Повторите попытку.')
+                    showinfo(title='', message='Аутентификация по клавиатурному почерку не пройдена. Повторите попытку.')                
+                    # Останвить прослушиватель
+                    return False  
+                else:
+                    self.predictions = np.array(self.predictions)
+                    print(self.predictions)
+                    print(np.shape(self.predictions))
+                    mean = np.mean(self.predictions)
+                    print(f'mean: {mean}')
                 
-                # Останвить прослушиватель
-                return False  
-      
+                    if mean > self.tolerance:
+                        self.app.state_machine.switch_to_user_profile()
+                        showinfo(title='', message='Аутентификация по клавиатурному почерку пройдена успешно!')                   
+                        # Останвить прослушиватель
+                        return False  
+                    else:
+                        self.app.state_machine.switch_to_password_authorization()
+                        showinfo(title='', message='Аутентификация по клавиатурному почерку не пройдена. Повторите попытку.')                
+                        # Останвить прослушиватель
+                        return False  
+    
 
     def feature_preparation(self):
         ''' Подготовка признаков '''
@@ -124,24 +131,25 @@ class KeystrokeAuthenticator:
         print(index)
         
         keys_hold_time = np.array(self.keys_hold_time[index:self.keys_counter])
-        keys_down_down_time = np.array(self.keys_down_down_time[index:self.keys_counter])
+        keys_down_down_time = np.array(self.keys_down_down_time[index:self.keys_counter - 1])
         
-        #print(np.shape(keys_hold_time))
-        #print(np.shape(keys_down_down_time))
-        
+        print(np.shape(keys_hold_time))
+        print(np.shape(keys_down_down_time))
+               
         # Try/Except?
         #keys_up_down_time = keys_down_down_time - keys_hold_time[:len(keys_hold_time) - 1]
         try:
             keys_up_down_time = keys_down_down_time - keys_hold_time[:len(keys_hold_time) - 1]
+            print('OK')
         except:
             min_len = min(len(keys_down_down_time), len(keys_hold_time[:len(keys_hold_time) - 1]))
             keys_up_down_time = keys_down_down_time[:min_len] - keys_hold_time[:min_len]
-            print('---- !!! Несоответствие длин массивов !!! ----')
+            print('-несоответствие длин массивов')
             
         features = []        
         
         # Подготовка веторов (Key[1]ID, Key[2]ID, Key[1]H, Key[2]H, DD, UD)
-        for i in range(len(keys_hold_time) - 1):
+        for i in range(len(keys_up_down_time)):
             try:
                 complete_vector = (self.virtual_keys_ID[i + index], 
                                    self.virtual_keys_ID[i + index + 1], 
@@ -151,7 +159,7 @@ class KeystrokeAuthenticator:
                                    keys_up_down_time[i])
                 features.append(complete_vector)
             except:
-                print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                print('-вектор не составлен')
 
         features = np.array(features)
         try:

@@ -102,6 +102,7 @@ class StateMachine:
         self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
         #showwarning(title='Предупреждение', message='Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')    
 
+
     def display_keystroke_authorization(self):
         print('display_keystroke_authorization')      
         self.app.characters_counter = 0 # Сбросить кол-во введенных символов
