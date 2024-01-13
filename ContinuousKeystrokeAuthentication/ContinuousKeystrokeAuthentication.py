@@ -643,7 +643,7 @@ class App(CTk.CTk):
         # Button: "Изменить пароль"
         self.settings_frame_change_password_button = CTk.CTkButton(self.settings_frame, 
                                                                    text='изменить пароль', 
-                                                                   command=self.login_event, 
+                                                                   command=self.change_password, 
                                                                    width=200,
                                                                    font=CTk.CTkFont(size=14, weight='bold'))
         self.settings_frame_change_password_button.grid(row=4, column=0, padx=0, pady=(8, 5))
@@ -861,6 +861,28 @@ class App(CTk.CTk):
         else:
             showwarning(title='Предупреждение', message='Заполните имя пользователя!')         
 
+
+    def change_password(self):
+        ''' Замена пароля на новый '''
+        
+        password = self.settings_frame_change_password_entry.get()
+    
+        logging.info('Попытка изменить пароль')
+         
+        if self.password_check(password):
+            with self.con:
+                # Хеширование пароля / добавление в БД
+                cur = self.con.cursor()  
+                hashed_password = argon2.using(rounds = self.argon2_rounds).hash(password)   
+                cur.execute(f'update {self.user_table_name} set hashed_password = ? WHERE login = ?', 
+                            (hashed_password, self.current_user))
+                self.con.commit()
+                                                       
+                showinfo(title='', message='Пароль успешно изменен!')
+                logging.info('Успешная смена пароля')
+        else:
+            logging.info('Сменить пароль не удалось')
+           
 
     def password_check(self, password: str) -> bool:
         ''' Проверить валидность пароля '''
