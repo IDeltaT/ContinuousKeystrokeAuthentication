@@ -109,6 +109,9 @@ class StateMachine:
         self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
         #showwarning(title='Предупреждение', message='Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')    
 
+        self.app.registration_username_entry.delete(0, CTk.END) # Отчистить поле логина
+        self.app.registration_password_entry.delete(0, CTk.END) # Отчистить поле пароля
+        
 
     def display_keystroke_authorization(self):
         print('display_keystroke_authorization')      
