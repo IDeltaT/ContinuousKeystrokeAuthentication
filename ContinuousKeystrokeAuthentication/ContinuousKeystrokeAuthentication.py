@@ -46,12 +46,12 @@ class StateMachine:
                      'after': 'display_password_authorization'},
 
                    { 'trigger': 'switch_to_registration', 
-                     'source': ['password_authorization', 'registration'], # !!!!
+                     'source': 'password_authorization',
                      'dest': 'registration',
                      'after': 'display_registration'},
 
                    { 'trigger': 'switch_to_keystroke_authorization', 
-                     'source': ['password_authorization', 'keystroke_authorization'], # !!!!
+                     'source': 'password_authorization',
                      'dest': 'keystroke_authorization',
                      'after': 'display_keystroke_authorization'},
                      
