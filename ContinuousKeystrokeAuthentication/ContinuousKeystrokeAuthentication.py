@@ -1000,17 +1000,12 @@ class App(CTk.CTk):
         ctypes.windll.user32.LockWorkStation()
 
 
-    def login_event(self):
-        # "Заглушка"
-        pass
-
 
 def main():
     app = App()
     app.mainloop()
 
-
-    
+ 
 
 if __name__ == '__main__':
     main()
