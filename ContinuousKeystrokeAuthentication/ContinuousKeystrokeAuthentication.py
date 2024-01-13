@@ -96,6 +96,9 @@ class StateMachine:
         
         self.frames['password_authorization_frame'].grid(row=0, column=0, sticky='ns')
 
+        self.app.username_entry.delete(0, CTk.END) # Отчистить поле логина
+        self.app.password_entry.delete(0, CTk.END) # Отчистить поле пароля
+        
 
     def display_registration(self):
         self.app.lock_work_station() # Заблокировать рабочую станцию
