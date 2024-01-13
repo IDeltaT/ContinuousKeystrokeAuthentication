@@ -18,6 +18,7 @@ from pynput import keyboard
 from time import time
 import numpy as np
 
+from ContinuousKeystrokeAuthenticator import ContinuousKeystrokeAuthenticator
 from KeystrokeAuthenticator import KeystrokeAuthenticator
 from FeatureExtractor import FeatureExtractor
 
@@ -74,8 +75,10 @@ class StateMachine:
                        'user_profile_frame': 0}
                 
         self.app = app # Доступ к переменным приложения
-        self.KA_listener = None # Экстрактор признаков (Слушатель)
-        self.FE_listener = None # Аутентификатор по клавиатурному почерку (Слушатель)
+        self.CKA_listener = None # Непрерывный аутентификатор по клавиатурному почерку (Слушатель)
+        self.KA_listener = None  # Аутентификатор по клавиатурному почерку (Слушатель)
+        self.FE_listener = None  # Экстрактор признаков (Слушатель) 
+        
 
 
     def frames_setter(self, frame_name: str, frame):
@@ -165,12 +168,22 @@ class StateMachine:
         # Отчистить поле замены пароля
         self.app.settings_frame_change_password_entry.delete(0, CTk.END) 
         
+        # Вывод логов
         with open(f'{self.app.logs_path}/{self.app.logs_file_name}.log', 'r') as logs:
             for log in logs:
                 if ('Finished' in log) or ('Executed' in log):
                     continue
                 else:
                     self.app.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
+                    
+        # Непрерывный аутентификатор по клавиатурному почерку
+        CKA = KeystrokeAuthenticator(self.app, 
+                                     self.app.models_path,
+                                     self.app.current_user, 
+                                     self.app.sliding_window_size)
+        listener = keyboard.Listener(on_press=CKA.on_press, on_release=CKA.on_release)
+        self.CKA_listener = listener
+        listener.start()
                 
        
 class App(CTk.CTk):
