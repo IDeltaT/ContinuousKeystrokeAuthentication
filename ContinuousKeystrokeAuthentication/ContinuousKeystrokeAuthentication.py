@@ -17,6 +17,8 @@ import numpy as np
 from KeystrokeAuthenticator import KeystrokeAuthenticator
 from FeatureExtractor import FeatureExtractor
 
+import logging
+
 
 
 class StateMachine:
@@ -153,6 +155,14 @@ class StateMachine:
 
         self.frames['user_profile_frame'].grid(row=0, column=0, sticky='ns')
         
+        with open(f'{self.app.logs_path}/{self.app.logs_file_name}.log', 'r') as logs:
+            for log in logs:
+                if ('Finished' in log) or ('Executed' in log):
+                    continue
+                else:
+                    self.app.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
+                
+       
 
 class App(CTk.CTk):
     ''' Пользовательский графический интерфейс '''
@@ -233,18 +243,18 @@ class App(CTk.CTk):
         self.ContAuth_Switch_BooleanVar = CTk.BooleanVar()
         self.ContAuth_Switch_BooleanVar.set(True)
         
-        # Примерный вид логов
-        self.logs = ['- 02.12.2023 15:27:41 Неверный ввод пароля;',
-                     '- 02.12.2023 15:29:16 Успешная авторизация в системе;',
-                     '- 02.12.2023 15:48:22 Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик);',
-                     '- 02.12.2023 15:48:22 Выведено системное предупреждение;',
-                     '- 02.12.2023 15:48:22 Компьютер заблокирован;',
-                     '- 02.12.2023 15:51:16 Успешная авторизация в системе;',
-                     '- 03.12.2023 13:11:52 Успешная авторизация в системе;',
-                     '- 03.12.2023 13:15:52 Успешно внесены изменения в настройки программы;',
-                     '- 03.12.2023 13:17:30 Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик);',
-                     '- 03.12.2023 13:17:30 Выведено системное предупреждение;',
-                     '- 03.12.2023 14:02:16 Успешная авторизация в системе;',]        
+        # Логирование
+        self.logs_path = 'Logs'
+        self.logs_file_name = 'logs'
+        is_exist = os.path.exists(self.logs_path)
+        if not is_exist:
+            os.makedirs(self.logs_path)            
+            showinfo(title='Предупреждение', message='Файлы логов не обнаружены.')
+            
+        logging.basicConfig(level=logging.INFO, 
+                            filename=f'{self.logs_path}/{self.logs_file_name}.log', 
+                            filemode='a',
+                            format='- %(asctime)s %(message)s;')   
 
 
         # --------------------------------- password authorization frame ---------------------------------- #
@@ -718,8 +728,8 @@ class App(CTk.CTk):
         self.logs_frame_event_log_textbox.delete('1.0', CTk.END) 
         
         
-        for log in reversed(self.logs):
-            self.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
+        #for log in reversed(self.logs):
+            #self.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
         #####################################################################################################
 
 
@@ -815,6 +825,8 @@ class App(CTk.CTk):
         password = self.registration_password_entry.get()
         
         #print(f'username: {username} | password: {password}')
+
+        logging.info('Попытка регистрации нового пользователя')
         
         if username:
             if ' ' in username:
@@ -836,6 +848,7 @@ class App(CTk.CTk):
                             self.settings_frame_current_user_label.configure(text = self.current_user)
                             
                             showinfo(title='', message='Регистрация прошла успешно!')
+                            logging.info('Успешная регистрация нового пользователя')
                             
                             # Переход в окно экстрактора признаков
                             self.state_machine.switch_to_keystroke_extract()
@@ -898,6 +911,7 @@ class App(CTk.CTk):
         
                 if user_data is None:
                     showwarning(title='', message='Имя пользователя или пароль введены неверно!')
+                    logging.info('Неудачная парольная авторизация')
                 else:
                     if password:
                         
@@ -911,10 +925,13 @@ class App(CTk.CTk):
                             self.current_user = username
                             self.settings_frame_current_user_label.configure(text = self.current_user)
                             
+                            logging.info('Успешная парольная авторизация')
+                            
                             # Переход в окно аутентификации по клавиатурному почерку
                             self.state_machine.switch_to_keystroke_authorization()
                         else:
                             showwarning(title='', message='Имя пользователя или пароль введены неверно!')
+                            logging.info('Неудачная парольная авторизация')
                     else:
                         showwarning(title='', message='Введите пароль!')
         else:
@@ -946,6 +963,7 @@ class App(CTk.CTk):
     def lock_work_station(self):
         ''' Заблокировать рабочую станцию '''
         
+        logging.info('Рабочая станция заблокирована')
         ctypes.windll.user32.LockWorkStation()
 
 

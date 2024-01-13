@@ -3,6 +3,7 @@ from tensorflow import keras
 from pynput import keyboard
 from time import time
 import numpy as np
+import logging
 import os
 
 
@@ -53,6 +54,19 @@ class KeystrokeAuthenticator:
         if not is_exist:
             os.makedirs(self.models_path)
             showinfo(title='Предупреждение', message='Папка с моделями не обнаружена (Создана новая папка).')
+
+        # Логирование
+        self.logs_path = 'Logs'
+        self.logs_file_name = 'logs'
+        is_exist = os.path.exists(self.logs_path)
+        if not is_exist:
+            os.makedirs(self.logs_path)            
+            showinfo(title='Предупреждение', message='Файлы логов не обнаружены.')
+            
+        logging.basicConfig(level=logging.INFO, 
+                            filename=f'{self.logs_path}/{self.logs_file_name}.log', 
+                            filemode='a',
+                            format='- %(asctime)s %(message)s;')
                         
 
     def on_press(self, key):
@@ -114,12 +128,14 @@ class KeystrokeAuthenticator:
                 
                     if mean > self.tolerance:
                         self.app.state_machine.switch_to_user_profile()
-                        showinfo(title='', message='Аутентификация по клавиатурному почерку пройдена успешно!')                   
+                        showinfo(title='', message='Аутентификация по клавиатурному почерку пройдена успешно!')
+                        logging.info('Аутентификация по клавиатурному почерку пройдена успешно')
                         # Останвить прослушиватель
                         return False  
                     else:
                         self.app.state_machine.switch_to_password_authorization()
-                        showinfo(title='', message='Аутентификация по клавиатурному почерку не пройдена. Повторите попытку.')                
+                        showinfo(title='', message='Аутентификация по клавиатурному почерку не пройдена. Повторите попытку.')
+                        logging.info('Аутентификация по клавиатурному почерку не пройдена')
                         # Останвить прослушиватель
                         return False  
     
