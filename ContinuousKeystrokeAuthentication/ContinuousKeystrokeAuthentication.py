@@ -628,7 +628,7 @@ class App(CTk.CTk):
         self.settings_frame_settings_label = CTk.CTkLabel(self.settings_frame, 
                                                           text='НАСТРОЙКИ:', 
                                                           font=CTk.CTkFont(size=18, weight='bold'))
-        self.settings_frame_settings_label.grid(row=2, column=0, padx=0, pady=(25, 5))
+        self.settings_frame_settings_label.grid(row=2, column=0, padx=0, pady=(13, 5))
 
 
         # Button: "сбросить модель"
@@ -637,7 +637,7 @@ class App(CTk.CTk):
                                                                command=self.state_machine.switch_to_keystroke_extract, 
                                                                width=200,
                                                                font=CTk.CTkFont(size=14, weight='bold'))
-        self.settings_frame_reset_model_button.grid(row=3, column=0, padx=0, pady=(10, 10))
+        self.settings_frame_reset_model_button.grid(row=3, column=0, padx=0, pady=(8, 8))
         
 
         # Button: "Изменить пароль"
@@ -646,14 +646,20 @@ class App(CTk.CTk):
                                                                    command=self.login_event, 
                                                                    width=200,
                                                                    font=CTk.CTkFont(size=14, weight='bold'))
-        self.settings_frame_change_password_button.grid(row=4, column=0, padx=0, pady=(10, 10))
+        self.settings_frame_change_password_button.grid(row=4, column=0, padx=0, pady=(8, 5))
+        
+        # Entry: Поле для замены пароля
+        self.settings_frame_change_password_entry = CTk.CTkEntry(self.settings_frame, 
+                                                                 width=200, 
+                                                                 placeholder_text='Новый пароль')
+        self.settings_frame_change_password_entry.grid(row=5, column=0, padx=30, pady=(0, 10))
         
 
         # Label: "допустимое отклонение"
         self.settings_frame_tolerance_label = CTk.CTkLabel(self.settings_frame, 
                                                           text='допустимое отклонение:', 
                                                           font=CTk.CTkFont(size=14, weight='bold'))
-        self.settings_frame_tolerance_label.grid(row=5, column=0, padx=0, pady=(5, 0))
+        self.settings_frame_tolerance_label.grid(row=6, column=0, padx=0, pady=(5, 0))
         
         
         # OptionMenu: Допустимое отклонение (стандартное/увеличенное)
@@ -662,12 +668,12 @@ class App(CTk.CTk):
                                                                values=['стандартное', 'увеличенное'],
                                                                width=200,
                                                                font=CTk.CTkFont(size=14, weight='bold'))
-        self.settings_frame_tolerance_mode.grid(row=6, column=0, padx=0, pady=(5, 10))
+        self.settings_frame_tolerance_mode.grid(row=7, column=0, padx=0, pady=(5, 10))
         
 
         # Создание подфрейма (Выбор действий, при обнаружении "Чужого" - предупреждений и/или блокирование)
         self.actions_frame = CTk.CTkFrame(self.settings_frame, corner_radius=10)
-        self.actions_frame.grid(row=7, column=0, pady=(8, 0))
+        self.actions_frame.grid(row=8, column=0, pady=(8, 0))
 
         # Label: действия при обнаружении "Чужого"
         self.settings_frame_tolerance_label = CTk.CTkLabel(self.actions_frame, 
@@ -694,7 +700,7 @@ class App(CTk.CTk):
                                                             text='     непрерывная\n  аутентификация',
                                                             variable=self.ContAuth_Switch_BooleanVar,
                                                             font=CTk.CTkFont(size=13, weight='bold'))
-        self.settings_frame_ContAuth_Switch.grid(row=8, column=0, pady=(15, 10))
+        self.settings_frame_ContAuth_Switch.grid(row=9, column=0, pady=(12, 10))
 
 
         # Button: "выйти"
@@ -703,7 +709,7 @@ class App(CTk.CTk):
                                                                    command=self.state_machine.switch_to_password_authorization, 
                                                                    width=200,
                                                                    font=CTk.CTkFont(size=14, weight='bold'))
-        self.settings_frame_logout_button.grid(row=9, column=0, padx=0, pady=(10, 10))
+        self.settings_frame_logout_button.grid(row=10, column=0, padx=0, pady=(5, 10))
 
 
         # Создание подфрейма, содержащего логи
@@ -726,10 +732,6 @@ class App(CTk.CTk):
         self.logs_frame_event_log_textbox.grid(row=1, column=0, padx=(20, 20), pady=(5, 0))
         
         self.logs_frame_event_log_textbox.delete('1.0', CTk.END) 
-        
-        
-        #for log in reversed(self.logs):
-            #self.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
         #####################################################################################################
 
 
