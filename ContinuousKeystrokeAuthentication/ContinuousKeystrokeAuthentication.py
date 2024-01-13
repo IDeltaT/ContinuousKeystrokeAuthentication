@@ -71,7 +71,9 @@ class StateMachine:
                        'user_profile_frame': 0}
                 
         self.app = app # Доступ к переменным приложения
-        
+        self.KA_listener = None # Экстрактор признаков (Слушатель)
+        self.FE_listener = None # Аутентификатор по клавиатурному почерку (Слушатель)
+
 
     def frames_setter(self, frame_name: str, frame):
         if frame_name in self.frames.keys():
@@ -120,6 +122,7 @@ class StateMachine:
         KA = KeystrokeAuthenticator(self.app, self.app.authentication_required_characters, self.app.models_path, 
                                     self.app.current_user, self.app.sliding_window_size)
         listener = keyboard.Listener(on_press=KA.on_press, on_release=KA.on_release)
+        self.KA_listener = listener
         listener.start()
         
 
@@ -935,7 +938,8 @@ class App(CTk.CTk):
     def sign_in_profile_via_lock(self):
         ''' Войти в профиль, через блокировку станции '''
         
-        self.lock_work_station()
+        self.state_machine.KA_listener.stop()
+        self.lock_work_station()        
         self.state_machine.switch_to_user_profile()
 
 
