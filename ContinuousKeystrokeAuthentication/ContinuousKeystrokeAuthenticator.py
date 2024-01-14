@@ -18,7 +18,7 @@ class ContinuousKeystrokeAuthenticator:
         self.current_user = current_user   # Имя текущего пользователя
         self.sliding_window_size = sliding_window_size  # Размер скользящего окна
         
-        self.fetures_number = 6                  # Кол-во признаков в завершенном векторе
+        self.fetures_number = 6          # Кол-во признаков в завершенном векторе
         
         self.start_times = np.zeros(254)
         self.start_typing = 0            # Время начала

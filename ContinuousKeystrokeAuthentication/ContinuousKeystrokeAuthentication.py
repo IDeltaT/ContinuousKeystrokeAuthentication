@@ -95,6 +95,13 @@ class StateMachine:
 
     def display_password_authorization(self):
         print('display_password_authorization')
+        
+        # Остановить CKA_listener, если он работает.
+        try:
+            self.CKA_listener.stop()
+        except:
+            pass
+        
         self.forget_all_frames()
         self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         
@@ -139,6 +146,13 @@ class StateMachine:
 
     def display_keystroke_extract(self):
         print('display_keystroke_extract')
+        
+        # Остановить CKA_listener, если он работает.
+        try:
+            self.CKA_listener.stop()
+        except:
+            pass
+        
         self.app.characters_counter = 0 # Сбросить кол-во введенных символов
         self.app.current_question = 0
         self.app.focus() # Убрать фокус с TextBox'а и остальных полей
