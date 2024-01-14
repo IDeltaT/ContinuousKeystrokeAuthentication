@@ -17,8 +17,7 @@ class ContinuousKeystrokeAuthenticator:
         self.models_path = models_path     # Путь, содержащий обученные модели
         self.current_user = current_user   # Имя текущего пользователя
         self.sliding_window_size = sliding_window_size  # Размер скользящего окна
-
-        self.sliding_window_array = np.array([]) # Скользящее окно
+        
         self.fetures_number = 6                  # Кол-во признаков в завершенном векторе
         
         self.start_times = np.zeros(254)
@@ -65,70 +64,86 @@ class ContinuousKeystrokeAuthenticator:
     def on_press(self, key):
         ''' Действия, производимые при нажатии клавиши '''
         
-        current_time = time() 
+        if (self.app.ContAuth_Switch_BooleanVar.get()):
+            current_time = time() 
 
-        if self.start_typing == 0:
-            self.start_typing = current_time
+            if self.start_typing == 0:
+                self.start_typing = current_time
 
-        if self.last_key_enterd_time != 0:
-            self.keys_down_down_time.append(current_time - self.last_key_enterd_time)                  
+            if self.last_key_enterd_time != 0:
+                self.keys_down_down_time.append(current_time - self.last_key_enterd_time)                  
                
-        self.last_key_enterd_time = current_time
+            self.last_key_enterd_time = current_time
         
-        if hasattr(key, 'vk'):
-            if self.start_times[key.vk] == 0:
-                self.start_times[key.vk] = current_time
-                self.virtual_keys_ID.append(key.vk/self.max_virtual_key)
-        else:
-            if self.start_times[key.value.vk] == 0:
-                self.start_times[key.value.vk] = current_time 
-                self.virtual_keys_ID.append(key.value.vk/self.max_virtual_key)
+            if hasattr(key, 'vk'):
+                if self.start_times[key.vk] == 0:
+                    self.start_times[key.vk] = current_time
+                    self.virtual_keys_ID.append(key.vk/self.max_virtual_key)
+            else:
+                if self.start_times[key.value.vk] == 0:
+                    self.start_times[key.value.vk] = current_time 
+                    self.virtual_keys_ID.append(key.value.vk/self.max_virtual_key)
          
                 
     def on_release(self, key):
         ''' Действия, производимые при отпускании клавиши '''
-        
-        current_time = time()
-        
-        self.keys_counter += 1
-               
-        if hasattr(key, 'vk'):
-            start = self.start_times[key.vk]
-            self.start_times[key.vk] = 0          
-        else: 
-            start = self.start_times[key.value.vk]
-            self.start_times[key.value.vk] = 0
-        self.keys_hold_time.append(current_time - start)             
-        
-        # Если нажатых клавиш, больше скользящего окна
-        if self.keys_counter > self.sliding_window_size:
-            self.feature_preparation()                      
-                          
-            if len(self.predictions) > self.predictions_required:
-                self.predictions = np.array(self.predictions)
-                print(self.predictions)
-                print(np.shape(self.predictions))
-                mean = np.mean(self.predictions)
-                print(f'mean: {mean}')
-                self.predictions = []
                 
-                if mean > self.tolerance:
-                    print('Легальный пользователь')
-                else:
-                    # Заблокировать рабочую станцию, если стоит соответствующий флаг
-                    if (self.app.block_CheckBox_BooleanVar.get()):
-                        self.app.lock_work_station()
+        if (self.app.ContAuth_Switch_BooleanVar.get()):
+            current_time = time()
+        
+            self.keys_counter += 1
+               
+            if hasattr(key, 'vk'):
+                start = self.start_times[key.vk]
+                self.start_times[key.vk] = 0          
+            else: 
+                start = self.start_times[key.value.vk]
+                self.start_times[key.value.vk] = 0
+            self.keys_hold_time.append(current_time - start)             
+        
+            # Если нажатых клавиш, больше скользящего окна
+            if self.keys_counter > self.sliding_window_size:
+                self.feature_preparation()                      
+                          
+                if len(self.predictions) > self.predictions_required:
+                    self.predictions = np.array(self.predictions)
+                    print(self.predictions)
+                    print(np.shape(self.predictions))
+                    mean = np.mean(self.predictions)
+                    print(f'mean: {mean}')
+                    self.predictions = []
+                
+                    if mean > self.tolerance:
+                        print('Легальный пользователь')
+                    else:
+                        # Заблокировать рабочую станцию, если стоит соответствующий флаг
+                        if (self.app.block_CheckBox_BooleanVar.get()):
+                            self.app.lock_work_station()
                         
-                    # Показать уведомление, если стоит соответствующий флаг
-                    if (self.app.alert_CheckBox_BooleanVar.get()):
-                        showwarning(title='Предупреждение', message='Обнаружен "Чужой" биометрический образ \
+                        # Показать уведомление, если стоит соответствующий флаг
+                        if (self.app.alert_CheckBox_BooleanVar.get()):
+                            showwarning(title='Предупреждение', message='Обнаружен "Чужой" биометрический образ \
 (потенциальный злоумышленик)') 
 
-                    logging.info('Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')
-                    
-                    # Останвить прослушиватель
-                    return False  
-    
+                        logging.info('Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')
+                        
+                        # Заного инициализировать основные переменные
+                        self.keys_counter = 0
+                        self.start_times = np.zeros(254)
+                        self.start_typing = 0
+                        self.keys_hold_time = []  
+                        self.keys_down_down_time = []
+                        self.keys_up_down_time = [] 
+                        self.last_key_enterd_time = 0
+                        self.virtual_keys_ID = []  
+                        self.predictions = []
+                        
+                        # Останвить прослушиватель
+                        #return False
+        else:
+            # Обнулить кол-во нажатых символов, когда отключена непрерывная аутентификация
+            self.keys_counter = 0
+               
 
     def feature_preparation(self):
         ''' Подготовка признаков '''
@@ -148,19 +163,19 @@ class ContinuousKeystrokeAuthenticator:
         except:
             min_len = min(len(keys_down_down_time), len(keys_hold_time[:len(keys_hold_time) - 1]))
             keys_up_down_time = keys_down_down_time[:min_len] - keys_hold_time[:min_len]
-            print('-несоответствие длин массивов')
-            
-        features = []        
+            print('-несоответствие длин массивов')          
+        
+        features = []
         
         # Подготовка веторов (Key[1]ID, Key[2]ID, Key[1]H, Key[2]H, DD, UD)
         for i in range(len(keys_up_down_time)):
             try:
                 complete_vector = (self.virtual_keys_ID[i + index], 
-                                   self.virtual_keys_ID[i + index + 1], 
-                                   keys_hold_time[i],
-                                   keys_hold_time[i + 1], 
-                                   keys_down_down_time[i], 
-                                   keys_up_down_time[i])
+                                    self.virtual_keys_ID[i + index + 1], 
+                                    keys_hold_time[i],
+                                    keys_hold_time[i + 1], 
+                                    keys_down_down_time[i], 
+                                    keys_up_down_time[i])
                 features.append(complete_vector)
             except:
                 print('-вектор не составлен')
