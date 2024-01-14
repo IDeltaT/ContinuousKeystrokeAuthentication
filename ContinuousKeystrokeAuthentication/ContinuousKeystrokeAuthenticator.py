@@ -61,17 +61,27 @@ class ContinuousKeystrokeAuthenticator:
                             filemode='a',
                             format='- %(asctime)s %(message)s;')
 
+
     def on_press(self, key):
         ''' Действия, производимые при нажатии клавиши '''
         
         if (self.app.ContAuth_Switch_BooleanVar.get()):
             current_time = time() 
 
+            dif_time = current_time - self.last_key_enterd_time
+            
             if self.start_typing == 0:
                 self.start_typing = current_time
 
+            # Если перерыв между нажатиями слишком большой, используем заданное значение
+            # Данный технику можно попробовать реализовать по другому (не засчитывать  
+            # признаки при нажатии и отпукании клавиши, но нужно правильно синхранизировать,
+            # для того, чтобы избежать разной размерности векторов)
             if self.last_key_enterd_time != 0:
-                self.keys_down_down_time.append(current_time - self.last_key_enterd_time)                  
+                if dif_time < 1.5:
+                    self.keys_down_down_time.append(dif_time)  
+                else:
+                    self.keys_down_down_time.append(1.5) 
                
             self.last_key_enterd_time = current_time
         
@@ -127,7 +137,7 @@ class ContinuousKeystrokeAuthenticator:
 
                         logging.info('Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')
                         
-                        # Заного инициализировать основные переменные
+                        # Заново инициализировать основные переменные
                         self.keys_counter = 0
                         self.start_times = np.zeros(254)
                         self.start_typing = 0
