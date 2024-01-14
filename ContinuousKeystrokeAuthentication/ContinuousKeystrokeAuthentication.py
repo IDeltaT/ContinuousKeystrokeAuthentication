@@ -110,8 +110,7 @@ class StateMachine:
         self.forget_all_frames()
         self.app.focus() # Убрать фокус с TextBox'а и остальных полей
         
-        self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')
-        #showwarning(title='Предупреждение', message='Обнаружен "Чужой" биометрический образ (потенциальный злоумышленик)')    
+        self.frames['registration_frame'].grid(row=0, column=0, sticky='ns')   
 
         self.app.registration_username_entry.delete(0, CTk.END) # Отчистить поле логина
         self.app.registration_password_entry.delete(0, CTk.END) # Отчистить поле пароля
@@ -177,10 +176,10 @@ class StateMachine:
                     self.app.logs_frame_event_log_textbox.insert(CTk.END, f'{log}\n')
                     
         # Непрерывный аутентификатор по клавиатурному почерку
-        CKA = KeystrokeAuthenticator(self.app, 
-                                     self.app.models_path,
-                                     self.app.current_user, 
-                                     self.app.sliding_window_size)
+        CKA = ContinuousKeystrokeAuthenticator(self.app, 
+                                               self.app.models_path,
+                                               self.app.current_user, 
+                                               self.app.sliding_window_size)
         listener = keyboard.Listener(on_press=CKA.on_press, on_release=CKA.on_release)
         self.CKA_listener = listener
         listener.start()
@@ -255,7 +254,7 @@ class App(CTk.CTk):
         
         self.alert_CheckBox_BooleanVar = CTk.BooleanVar()
         self.alert_CheckBox_BooleanVar.set(True)
-        
+
         self.block_CheckBox_BooleanVar = CTk.BooleanVar()
         self.block_CheckBox_BooleanVar.set(True)
         
